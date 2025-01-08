@@ -81,11 +81,11 @@ public class SystemTestCommand extends LoggingCommand {
      */
     private void readSelectedMotor() {
 
-        boolean rightBumper = controller.getRightBumper() && !previousRightBumper;
-        previousRightBumper = controller.getRightBumper();
+        boolean rightBumper = controller.getRightBumperButton() && !previousRightBumper;
+        previousRightBumper = controller.getRightBumperButton();
 
-        boolean leftBumper = controller.getLeftBumper() && !previousLeftBumper;
-        previousLeftBumper = controller.getLeftBumper();
+        boolean leftBumper = controller.getLeftBumperButton() && !previousLeftBumper;
+        previousLeftBumper = controller.getLeftBumperButton();
 
         if (rightBumper || leftBumper) {
 

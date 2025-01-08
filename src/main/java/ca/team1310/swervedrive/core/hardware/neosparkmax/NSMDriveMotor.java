@@ -2,37 +2,47 @@ package ca.team1310.swervedrive.core.hardware.neosparkmax;
 
 import ca.team1310.swervedrive.core.DriveMotor;
 import ca.team1310.swervedrive.core.config.MotorConfig;
-import com.revrobotics.CANSparkBase;
+
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class NSMDriveMotor extends NSMMotor implements DriveMotor {
     public NSMDriveMotor(int canId, MotorConfig cfg, double wheelRadiusMetres) {
         super(canId);
 
+        SparkMaxConfig config = new SparkMaxConfig();
+
         // instantiate & configure motor
-        this.motor.setInverted(cfg.inverted());
-        configureSparkMax(() -> motor.enableVoltageCompensation(cfg.nominalVoltage()));
-        configureSparkMax(() -> motor.setSmartCurrentLimit(cfg.currentLimitAmps()));
-        configureSparkMax(() -> motor.setClosedLoopRampRate(cfg.rampRateSecondsZeroToFull()));
+        config
+            .inverted(cfg.inverted())
+            .voltageCompensation(cfg.nominalVoltage())
+            .smartCurrentLimit(cfg.currentLimitAmps())
+            .closedLoopRampRate(cfg.rampRateSecondsZeroToFull())
+            .idleMode(IdleMode.kBrake);
 
         // configure integrated encoder
-        final double positionConversionfactor = (2 * Math.PI * wheelRadiusMetres) / cfg.gearRatio();
-        // report in metres not rotations
-        configureSparkMax(() -> encoder.setPositionConversionFactor(positionConversionfactor));
-        // report in metres per second not rotations per minute
-        configureSparkMax(() -> encoder.setVelocityConversionFactor(positionConversionfactor / 60));
+        final double positionConversionFactor = (2 * Math.PI * wheelRadiusMetres) / cfg.gearRatio();
 
-        pid.setFeedbackDevice(encoder); // Configure feedback of the PID controller as the
-        // integrated encoder.
-        configureSparkMax(() -> pid.setP(cfg.p(), 0));
-        configureSparkMax(() -> pid.setI(cfg.i(), 0));
-        configureSparkMax(() -> pid.setD(cfg.d(), 0));
-        configureSparkMax(() -> pid.setFF(cfg.ff(), 0));
-        configureSparkMax(() -> pid.setIZone(cfg.izone(), 0));
-        configureSparkMax(() -> pid.setOutputRange(-1, 1, 0));
-        configureSparkMax(() -> pid.setPositionPIDWrappingEnabled(false));
-        setMotorBrake(true);
+        config.encoder
+            // report in metres not rotations
+            .positionConversionFactor(positionConversionFactor)
+            // report in metres per second not rotations per minute
+            .velocityConversionFactor(positionConversionFactor / 60);
 
-        burnFlash();
+        config.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(0,0,0)
+            .velocityFF(cfg.ff(), ClosedLoopSlot.kSlot0)
+            .iZone(cfg.izone(), ClosedLoopSlot.kSlot0)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot0)
+            .positionWrappingEnabled(true);
+
+        motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
@@ -42,7 +52,7 @@ public class NSMDriveMotor extends NSMMotor implements DriveMotor {
 
     @Override
     public void setReferenceVelocity(double targetVelocityMPS) {
-        configureSparkMax(() -> pid.setReference(targetVelocityMPS, CANSparkBase.ControlType.kVelocity, 0, 0));
+        configureSparkMax(() -> pid.setReference(targetVelocityMPS, ControlType.kVelocity, ClosedLoopSlot.kSlot0, 0));
     }
 
     @Override

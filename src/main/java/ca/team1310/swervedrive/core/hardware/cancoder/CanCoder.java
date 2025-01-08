@@ -9,9 +9,10 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.MagnetHealthValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class CanCoder implements AbsoluteAngleEncoder {
@@ -36,7 +37,7 @@ public class CanCoder implements AbsoluteAngleEncoder {
         MagnetSensorConfigs magnetSensorConfiguration = new MagnetSensorConfigs();
         cfg.refresh(magnetSensorConfiguration);
         cfg.apply(magnetSensorConfiguration
-            .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
+            .withAbsoluteSensorDiscontinuityPoint(1)  // As Per https://api.ctr-electronics.com/changelog.html#added-20241121
             .withSensorDirection(
                 encoderConfig.inverted() ? SensorDirectionValue.Clockwise_Positive
                     : SensorDirectionValue.CounterClockwise_Positive));
@@ -59,7 +60,7 @@ public class CanCoder implements AbsoluteAngleEncoder {
             return -1.0;
         }
 
-        StatusSignal<Double> angle = encoder.getAbsolutePosition().refresh();
+        StatusSignal<Angle> angle = encoder.getAbsolutePosition().refresh();
 
         int                  retryCount;
         for (retryCount = 0; retryCount < maximumRetries; retryCount++) {
@@ -78,7 +79,7 @@ public class CanCoder implements AbsoluteAngleEncoder {
                 + " retries to get valid data.", false);
         }
 
-        return (angle.getValue() * 360 - absoluteEncoderOffset + 360) % 360;
+        return (angle.getValueAsDouble() * 360 - absoluteEncoderOffset + 360) % 360;
     }
 
     private boolean isNotHealthy() {

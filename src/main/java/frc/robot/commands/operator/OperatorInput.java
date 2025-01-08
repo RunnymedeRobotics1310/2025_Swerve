@@ -58,11 +58,11 @@ public class OperatorInput {
 
 
     public boolean isDriverLeftBumper() {
-        return driverController.getLeftBumper();
+        return driverController.getLeftBumperButton();
     }
 
     public boolean isDriverRightBumper() {
-        return driverController.getRightBumper();
+        return driverController.getRightBumperButton();
     }
 
     public boolean isFaceSpeaker() {
