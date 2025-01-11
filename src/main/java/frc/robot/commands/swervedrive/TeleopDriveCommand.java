@@ -170,7 +170,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // handy utilities
         Translation2d input     = new Translation2d(vX, vY);
         double        magnitude = input.getNorm();
-        Rotation2d    angle     = input.getAngle();
+        Rotation2d    angle     = magnitude > 1e-6 ?  input.getAngle() : new Rotation2d(); // todo: bug: not safe - invalid if magnitude is 0
 
         // handle case where in simulator, a value of 1,1 is possible whereas normally the
         // controller magnitude never exceeds 1

@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.SwerveTelemetry;
+import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
 import ca.team1310.swerve.utils.SwerveUtils;
 import ca.team1310.swerve.vision.VisionAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
@@ -27,7 +28,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private final PIDController              velocityPIDController;
 
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
-        this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
+        this.drive = new FieldAwareSwerveDrive(config.coreConfig());
+//        this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
         this.config                 = config;
         this.telemetry              = config.coreConfig().telemetry();
         this.maxTranslationSpeedMPS = config.coreConfig().maxAttainableTranslationSpeedMetresPerSecond();
