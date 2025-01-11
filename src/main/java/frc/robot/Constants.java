@@ -6,13 +6,13 @@ package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
-import ca.team1310.swervedrive.SwerveTelemetry;
+import ca.team1310.swerve.SwerveTelemetry;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystemConfig;
-import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
-import ca.team1310.swervedrive.core.config.EncoderConfig;
-import ca.team1310.swervedrive.core.config.ModuleConfig;
-import ca.team1310.swervedrive.core.config.MotorConfig;
-import ca.team1310.swervedrive.vision.VisionConfig;
+import ca.team1310.swerve.core.config.CoreSwerveConfig;
+import ca.team1310.swerve.core.config.EncoderConfig;
+import ca.team1310.swerve.core.config.ModuleConfig;
+import ca.team1310.swerve.core.config.MotorConfig;
+import ca.team1310.swerve.vision.VisionConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;

@@ -1,9 +1,9 @@
 package frc.robot.subsystems.swerve;
 
-import ca.team1310.swervedrive.RunnymedeSwerveDrive;
-import ca.team1310.swervedrive.SwerveTelemetry;
-import ca.team1310.swervedrive.utils.SwerveUtils;
-import ca.team1310.swervedrive.vision.VisionAwareSwerveDrive;
+import ca.team1310.swerve.RunnymedeSwerveDrive;
+import ca.team1310.swerve.SwerveTelemetry;
+import ca.team1310.swerve.utils.SwerveUtils;
+import ca.team1310.swerve.vision.VisionAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
@@ -11,8 +11,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static ca.team1310.swervedrive.utils.SwerveUtils.difference;
-import static ca.team1310.swervedrive.utils.SwerveUtils.normalizeRotation;
+import static ca.team1310.swerve.utils.SwerveUtils.difference;
+import static ca.team1310.swerve.utils.SwerveUtils.normalizeRotation;
 
 
 public class SwerveSubsystem extends SubsystemBase {

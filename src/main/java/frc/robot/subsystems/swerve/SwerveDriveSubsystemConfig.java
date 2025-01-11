@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swerve;
 
-import ca.team1310.swervedrive.core.config.CoreSwerveConfig;
-import ca.team1310.swervedrive.vision.VisionConfig;
+import ca.team1310.swerve.core.config.CoreSwerveConfig;
+import ca.team1310.swerve.vision.VisionConfig;
 
 public record SwerveDriveSubsystemConfig(
     boolean enabled,
