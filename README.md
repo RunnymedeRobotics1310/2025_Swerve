@@ -2,6 +2,11 @@
 
 This repository is the code that operates FRC Team 1310's 2025 swerve drive.
 
+## Local Development
+
+### Code Formatting
+This project uses prettier java code formatting. [Be sure to follow the instructions here](https://github.com/jhipster/prettier-java/blob/main/docs/advanced_usage.md).
+
 ## Dependencies
 
 In addition to the standard WPILib dependencies, this project relies on Runnymede Robotics' [Runnymede Swerve Library](https://github.com/RunnymedeRobotics1310/RunnymedeSwerve).
