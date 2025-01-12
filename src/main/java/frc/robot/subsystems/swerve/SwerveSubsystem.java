@@ -201,12 +201,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {
-        drive.updateOdometry();
-    }
-
-
-    @Override
     public String toString() {
         Pose2d pose  = getPose();
         double x     = pose.getX();
