@@ -9,5 +9,5 @@ public record SwerveRotationConfig(
     double toleranceRadians,
     double headingP,
     double headingI,
-    double headingD) {
-}
+    double headingD
+) {}

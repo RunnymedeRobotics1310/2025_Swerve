@@ -4,10 +4,10 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -19,15 +19,14 @@ import frc.robot.commands.swervedrive.TeleopDriveCommand;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+
     private final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem(Constants.Swerve.SUBSYSTEM_CONFIG);
-    private final OperatorInput   operatorInput        = new OperatorInput(
-        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
+    private final OperatorInput operatorInput = new OperatorInput(OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-
         // Initialize all Subsystem default commands
         swerveDriveSubsystem.setDefaultCommand(new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
         // Configure the trigger bindings

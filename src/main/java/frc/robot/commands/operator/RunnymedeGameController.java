@@ -19,7 +19,7 @@ public class RunnymedeGameController extends XboxController {
 
     public static final double DEFAULT_AXIS_DEADBAND = .2;
 
-    private double             axisDeadband          = DEFAULT_AXIS_DEADBAND;
+    private double axisDeadband = DEFAULT_AXIS_DEADBAND;
 
     /**
      * Construct a RunnymedeGameController on the specified port
@@ -44,39 +44,36 @@ public class RunnymedeGameController extends XboxController {
      */
     public RunnymedeGameController(int port, final double axisDeadband) {
         super(port);
-
         if (axisDeadband < 0 || axisDeadband > 0.4) {
-            System.out.println("Invalid axis deadband(" + axisDeadband + ") must be between 0 - 0.4. Overriding value to "
-                + DEFAULT_AXIS_DEADBAND);
+            System.out.println(
+                "Invalid axis deadband(" + axisDeadband + ") must be between 0 - 0.4. Overriding value to " + DEFAULT_AXIS_DEADBAND
+            );
             setAxisDeadband(DEFAULT_AXIS_DEADBAND);
-        }
-        else {
+        } else {
             setAxisDeadband(axisDeadband);
         }
     }
 
     @Override
     public double getRawAxis(int axis) {
-
         double axisValue = super.getRawAxis(axis);
 
         if (Math.abs(axisValue) < axisDeadband) {
             axisValue = 0;
-        }
-        else {
+        } else {
             // Subtract the deadband (take the absolute value in order to remove
             // the deadband amount whether it is positive or negative.
             double value = Math.abs(axisValue) - axisDeadband;
 
             // Scale the value to the full range of 0-1.0 after the deadband amount
             // is removed
-            value      = value / (1.0 - axisDeadband);
+            value = value / (1.0 - axisDeadband);
 
             // multiply by 1.0 or -1.0 in order to put the sign back
             // on the end result based on the original axis value.
-            value     *= Math.signum(axisValue);
+            value *= Math.signum(axisValue);
 
-            axisValue  = value;
+            axisValue = value;
         }
 
         // The Y axis values should be inverted in order to make North (away
@@ -106,10 +103,13 @@ public class RunnymedeGameController extends XboxController {
      * zero. Setting the axisDeadbanding to zero turns off all deadbanding.
      */
     public void setAxisDeadband(double axisDeadband) {
-
         if (axisDeadband < 0 || axisDeadband > 0.4) {
-            System.out.println("Invalid axis deadband(" + axisDeadband
-                + ") must be between 0 - 0.4. Axis deadband value not changed.  Currently " + this.axisDeadband);
+            System.out.println(
+                "Invalid axis deadband(" +
+                axisDeadband +
+                ") must be between 0 - 0.4. Axis deadband value not changed.  Currently " +
+                this.axisDeadband
+            );
             return;
         }
 

@@ -2,7 +2,7 @@ package frc.robot.subsystems.swerve;
 
 /**
  * Configure the translation configuration properties of this swerve drive.
- * 
+ *
  * @param toleranceMetres The tolerance in meters for the translation. If the robot is within this
  * distance of the target, it is considered on target.
  * @param minSpeedMPS The minimum speed the robot will move at. This is to prevent the robot from
@@ -38,5 +38,5 @@ public record SwerveTranslationConfig(
     double maxAccelMPS2,
     double velocityP,
     double velocityI,
-    double velocityD) {
-}
+    double velocityD
+) {}

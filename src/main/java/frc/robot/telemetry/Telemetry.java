@@ -4,10 +4,9 @@ public class Telemetry {
 
     public static final String PREFIX = "1310/";
 
-    public static Test         test   = new Test();
+    public static Test test = new Test();
 
-    private Telemetry() {
-    }
+    private Telemetry() {}
 
     public static void post() {
         test.post();

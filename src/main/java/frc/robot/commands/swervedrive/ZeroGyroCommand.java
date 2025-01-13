@@ -11,9 +11,7 @@ public class ZeroGyroCommand extends InstantCommand {
      * @param driveSubsystem
      */
     public ZeroGyroCommand(SwerveSubsystem driveSubsystem) {
-
         super(() -> {
-
             System.out.println("ZeroGyroCommand: Set the current heading to 0");
 
             driveSubsystem.zeroGyro();
@@ -25,5 +23,4 @@ public class ZeroGyroCommand extends InstantCommand {
         // Allow the gyro heading to be set when the robot is disabled
         return true;
     }
-
 }

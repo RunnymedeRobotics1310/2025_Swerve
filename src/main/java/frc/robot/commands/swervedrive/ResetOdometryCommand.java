@@ -1,11 +1,11 @@
 package frc.robot.commands.swervedrive;
 
+import static frc.robot.RunnymedeUtils.getRunnymedeAlliance;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-
-import static frc.robot.RunnymedeUtils.getRunnymedeAlliance;
 
 public class ResetOdometryCommand extends InstantCommand {
 
@@ -14,8 +14,7 @@ public class ResetOdometryCommand extends InstantCommand {
             if (getRunnymedeAlliance() == DriverStation.Alliance.Blue) {
                 System.out.println("ResetOdometryCommand: Reset the pose to " + bluePose.toString());
                 swerve.resetOdometry(bluePose);
-            }
-            else {
+            } else {
                 System.out.println("ResetOdometryCommand: Reset the pose to " + redPose.toString());
                 swerve.resetOdometry(redPose);
             }

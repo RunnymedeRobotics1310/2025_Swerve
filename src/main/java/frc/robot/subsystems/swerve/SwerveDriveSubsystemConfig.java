@@ -8,5 +8,5 @@ public record SwerveDriveSubsystemConfig(
     CoreSwerveConfig coreConfig,
     VisionConfig visionConfig,
     SwerveTranslationConfig translationConfig,
-    SwerveRotationConfig rotationConfig) {
-}
+    SwerveRotationConfig rotationConfig
+) {}

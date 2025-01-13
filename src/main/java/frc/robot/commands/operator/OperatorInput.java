@@ -1,5 +1,8 @@
 package frc.robot.commands.operator;
 
+import static frc.robot.Constants.UsefulPoses.BLUE_2_2_20;
+import static frc.robot.Constants.UsefulPoses.RED_2_2_20;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,9 +18,6 @@ import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.commands.test.SystemTestCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
-import static frc.robot.Constants.UsefulPoses.BLUE_2_2_20;
-import static frc.robot.Constants.UsefulPoses.RED_2_2_20;
-
 /**
  * The DriverController exposes all driver functions
  */
@@ -27,11 +27,13 @@ public class OperatorInput {
     private final XboxController operatorController;
 
     public enum Stick {
-        LEFT, RIGHT
+        LEFT,
+        RIGHT
     }
 
     public enum Axis {
-        X, Y
+        X,
+        Y
     }
 
     /**
@@ -44,7 +46,7 @@ public class OperatorInput {
      * plugged into
      */
     public OperatorInput(int driverControllerPort, int operatorControllerPort) {
-        driverController   = new RunnymedeGameController(driverControllerPort);
+        driverController = new RunnymedeGameController(driverControllerPort);
         operatorController = new RunnymedeGameController(operatorControllerPort);
     }
 
@@ -55,7 +57,6 @@ public class OperatorInput {
     public XboxController getRawDriverController() {
         return driverController;
     }
-
 
     public boolean isDriverLeftBumper() {
         return driverController.getLeftBumperButton();
@@ -78,24 +79,21 @@ public class OperatorInput {
     }
 
     public double getDriverControllerAxis(Stick stick, Axis axis) {
-
         switch (stick) {
-
-        case LEFT:
-            switch (axis) {
-            case X:
-                return driverController.getLeftX();
-            case Y:
-                return driverController.getLeftY();
-            }
-            break;
-
-        case RIGHT:
-            switch (axis) {
-            case X:
-                return driverController.getRightX();
-            }
-            break;
+            case LEFT:
+                switch (axis) {
+                    case X:
+                        return driverController.getLeftX();
+                    case Y:
+                        return driverController.getLeftY();
+                }
+                break;
+            case RIGHT:
+                switch (axis) {
+                    case X:
+                        return driverController.getRightX();
+                }
+                break;
         }
 
         return 0;
@@ -117,26 +115,25 @@ public class OperatorInput {
      */
     public void configureBindings(SwerveSubsystem driveSubsystem) {
         // Enter Test Mode (Start and Back pressed at the same time)
-        new Trigger(() -> (isToggleTestMode()))
-            .onTrue(
-                new SystemTestCommand(this, driveSubsystem));
+        new Trigger(() -> (isToggleTestMode())).onTrue(new SystemTestCommand(this, driveSubsystem));
 
         new Trigger(driverController::getBackButton).onTrue(new ZeroGyroCommand(driveSubsystem));
         new Trigger(this::isCancel).whileTrue(new CancelCommand(driveSubsystem));
-        new Trigger(driverController::getXButton)
-            .whileTrue(new ResetOdometryCommand(driveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0))));
+        new Trigger(driverController::getXButton).whileTrue(
+            new ResetOdometryCommand(driveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0)))
+        );
 
         // drive forward
-        Translation2d        fwd        = new Translation2d(0, 7);
-        Rotation2d           fwdHeading = Rotation2d.fromDegrees(0);
-        DriveDistanceCommand ddc        = new DriveDistanceCommand(driveSubsystem, fwd, fwdHeading, 3);
+        Translation2d fwd = new Translation2d(0, 7);
+        Rotation2d fwdHeading = Rotation2d.fromDegrees(0);
+        DriveDistanceCommand ddc = new DriveDistanceCommand(driveSubsystem, fwd, fwdHeading, 3);
         new Trigger(driverController::getAButton).onTrue(ddc);
 
         // drive to position test
-        Translation2d          location    = new Translation2d(2, 2);
-        Rotation2d             heading     = Rotation2d.fromDegrees(-20);
-        Pose2d                 desiredPose = new Pose2d(location, heading);
-        DriveToPositionCommand dtpc        = new DriveToPositionCommand(driveSubsystem, BLUE_2_2_20, RED_2_2_20);
+        Translation2d location = new Translation2d(2, 2);
+        Rotation2d heading = Rotation2d.fromDegrees(-20);
+        Pose2d desiredPose = new Pose2d(location, heading);
+        DriveToPositionCommand dtpc = new DriveToPositionCommand(driveSubsystem, BLUE_2_2_20, RED_2_2_20);
         new Trigger(driverController::getBButton).onTrue(dtpc);
     }
 }
