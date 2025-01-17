@@ -76,8 +76,6 @@ public final class Constants {
 
         public static final double SDS_MK4I_WHEEL_RADIUS_M = 0.0051;
 
-        private static final int ANGLE_ENCODER_UPDATE_FREQ = 10;
-
         public static final SwerveTranslationConfig TRANSLATION_CONFIG = new SwerveTranslationConfig(
             0.02,
             1.0,
@@ -139,9 +137,8 @@ public final class Constants {
             11,
             ANGLE_MOTOR_CONFIG,
             12,
-            Rotation2d.fromRotations(0.281494).getDegrees(),
-            ANGLE_ENCODER_CONFIG,
-            ANGLE_ENCODER_UPDATE_FREQ
+            Rotation2d.fromRotations(0.719971).getDegrees(),
+            ANGLE_ENCODER_CONFIG
         );
 
         public static final ModuleConfig FRONT_RIGHT = new ModuleConfig(
@@ -154,9 +151,8 @@ public final class Constants {
             21,
             ANGLE_MOTOR_CONFIG,
             22,
-            Rotation2d.fromRotations(0.407959).getDegrees(),
-            ANGLE_ENCODER_CONFIG,
-            ANGLE_ENCODER_UPDATE_FREQ
+            Rotation2d.fromRotations(0.592529).getDegrees(),
+            ANGLE_ENCODER_CONFIG
         );
 
         public static final ModuleConfig BACK_LEFT = new ModuleConfig(
@@ -169,9 +165,8 @@ public final class Constants {
             36,
             ANGLE_MOTOR_CONFIG,
             37,
-            Rotation2d.fromRotations(0.503418).getDegrees(),
-            ANGLE_ENCODER_CONFIG,
-            ANGLE_ENCODER_UPDATE_FREQ
+            Rotation2d.fromRotations(0.497559).getDegrees(),
+            ANGLE_ENCODER_CONFIG
         );
 
         public static final ModuleConfig BACK_RIGHT = new ModuleConfig(
@@ -184,9 +179,8 @@ public final class Constants {
             31,
             ANGLE_MOTOR_CONFIG,
             32,
-            Rotation2d.fromRotations(0.359131).getDegrees(),
-            ANGLE_ENCODER_CONFIG,
-            ANGLE_ENCODER_UPDATE_FREQ
+            Rotation2d.fromRotations(0.642334).getDegrees(),
+            ANGLE_ENCODER_CONFIG
         );
 
         public static final SwerveTelemetry TELEMETRY = new SwerveTelemetry(4);
