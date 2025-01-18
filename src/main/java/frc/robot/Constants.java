@@ -7,10 +7,7 @@ package frc.robot;
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
 import ca.team1310.swerve.SwerveTelemetry;
-import ca.team1310.swerve.core.config.CoreSwerveConfig;
-import ca.team1310.swerve.core.config.EncoderConfig;
-import ca.team1310.swerve.core.config.ModuleConfig;
-import ca.team1310.swerve.core.config.MotorConfig;
+import ca.team1310.swerve.core.config.*;
 import ca.team1310.swerve.vision.VisionConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -100,6 +97,7 @@ public final class Constants {
         );
 
         private static final MotorConfig ANGLE_MOTOR_CONFIG = new MotorConfig(
+            MotorType.NEO_SPARK_MAX,
             true,
             20,
             12,
@@ -113,6 +111,7 @@ public final class Constants {
         );
 
         private static final MotorConfig DRIVE_MOTOR_CONFIG = new MotorConfig(
+            MotorType.NEO_SPARK_FLEX,
             true,
             40,
             12,
