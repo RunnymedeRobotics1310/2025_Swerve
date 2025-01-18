@@ -1,5 +1,7 @@
 package frc.robot.commands.operator;
 
+import static frc.robot.Constants.AutoConstants.AutoPattern.*;
+import static frc.robot.Constants.AutoConstants.Delay.*;
 import static frc.robot.Constants.UsefulPoses.BLUE_2_2_20;
 import static frc.robot.Constants.UsefulPoses.RED_2_2_20;
 
@@ -8,9 +10,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.commands.CancelCommand;
+import frc.robot.commands.auto.ExitZoneAutoCommand;
+import frc.robot.commands.auto.OptimisticAutoCommand;
 import frc.robot.commands.swervedrive.DriveDistanceCommand;
 import frc.robot.commands.swervedrive.DriveToPositionCommand;
 import frc.robot.commands.swervedrive.ResetOdometryCommand;
@@ -23,8 +31,11 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
  */
 public class OperatorInput {
 
+    private final SwerveSubsystem swerve;
     private final XboxController driverController;
     private final XboxController operatorController;
+    private final SendableChooser<Constants.AutoConstants.AutoPattern> autoPatternChooser = new SendableChooser<>();
+    private final SendableChooser<Constants.AutoConstants.Delay> delayChooser = new SendableChooser<>();
 
     public enum Stick {
         LEFT,
@@ -45,7 +56,8 @@ public class OperatorInput {
      * @param operatorControllerPort on the driver station which the aux joystick is
      * plugged into
      */
-    public OperatorInput(int driverControllerPort, int operatorControllerPort) {
+    public OperatorInput(int driverControllerPort, int operatorControllerPort, SwerveSubsystem swerve) {
+        this.swerve = swerve;
         driverController = new RunnymedeGameController(driverControllerPort);
         operatorController = new RunnymedeGameController(operatorControllerPort);
     }
@@ -135,5 +147,27 @@ public class OperatorInput {
         Pose2d desiredPose = new Pose2d(location, heading);
         DriveToPositionCommand dtpc = new DriveToPositionCommand(driveSubsystem, BLUE_2_2_20, RED_2_2_20);
         new Trigger(driverController::getBButton).onTrue(dtpc);
+    }
+
+    public Command getAutonomousCommand() {
+        double delay =
+            switch (delayChooser.getSelected()) {
+                case WAIT_0_5_SECOND -> 0.5;
+                case WAIT_1_SECOND -> 1;
+                case WAIT_1_5_SECONDS -> 1.5;
+                case WAIT_2_SECONDS -> 2;
+                case WAIT_2_5_SECONDS -> 2.5;
+                case WAIT_3_SECONDS -> 3;
+                case WAIT_5_SECONDS -> 5;
+                default -> 0;
+            };
+
+        return switch (autoPatternChooser.getSelected()) {
+            // not used
+            case OPTIMISTIC_AUTO -> new OptimisticAutoCommand(swerve, delay);
+            // used in competition
+            case EXIT_ZONE -> new ExitZoneAutoCommand(swerve, delay);
+            default -> new InstantCommand();
+        };
     }
 }

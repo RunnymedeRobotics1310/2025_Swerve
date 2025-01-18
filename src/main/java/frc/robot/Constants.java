@@ -219,6 +219,26 @@ public final class Constants {
         );
     }
 
+    public static final class AutoConstants {
+
+        public enum AutoPattern {
+            DO_NOTHING,
+            EXIT_ZONE,
+            OPTIMISTIC_AUTO
+        }
+
+        public enum Delay {
+            NO_DELAY,
+            WAIT_0_5_SECOND,
+            WAIT_1_SECOND,
+            WAIT_1_5_SECONDS,
+            WAIT_2_SECONDS,
+            WAIT_2_5_SECONDS,
+            WAIT_3_SECONDS,
+            WAIT_5_SECONDS
+        }
+    }
+
     public enum BotTarget {
         // Blue Field Targets
         BLUE_AMP(new Translation3d(1.8415, 8.2042, 0.873252)),

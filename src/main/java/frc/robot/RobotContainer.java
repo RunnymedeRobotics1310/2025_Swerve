@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
@@ -21,7 +22,11 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 public class RobotContainer {
 
     private final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem(Constants.Swerve.SUBSYSTEM_CONFIG);
-    private final OperatorInput operatorInput = new OperatorInput(OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
+    private final OperatorInput operatorInput = new OperatorInput(
+        OiConstants.DRIVER_CONTROLLER_PORT,
+        OiConstants.OPERATOR_CONTROLLER_PORT,
+        swerveDriveSubsystem
+    );
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -31,5 +36,9 @@ public class RobotContainer {
         swerveDriveSubsystem.setDefaultCommand(new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
         // Configure the trigger bindings
         operatorInput.configureBindings(swerveDriveSubsystem);
+    }
+
+    public Command getAutonomousCommand() {
+        return operatorInput.getAutonomousCommand();
     }
 }
