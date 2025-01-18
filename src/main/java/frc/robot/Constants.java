@@ -137,7 +137,7 @@ public final class Constants {
             11,
             ANGLE_MOTOR_CONFIG,
             12,
-            Rotation2d.fromRotations(0.719971).getDegrees(),
+            Rotation2d.fromRotations(0.279785).getDegrees(),
             ANGLE_ENCODER_CONFIG
         );
 
@@ -151,7 +151,7 @@ public final class Constants {
             21,
             ANGLE_MOTOR_CONFIG,
             22,
-            Rotation2d.fromRotations(0.592529).getDegrees(),
+            Rotation2d.fromRotations(0.405518).getDegrees(),
             ANGLE_ENCODER_CONFIG
         );
 
@@ -165,7 +165,7 @@ public final class Constants {
             36,
             ANGLE_MOTOR_CONFIG,
             37,
-            Rotation2d.fromRotations(0.497559).getDegrees(),
+            Rotation2d.fromRotations(0.501953).getDegrees(),
             ANGLE_ENCODER_CONFIG
         );
 
@@ -179,7 +179,7 @@ public final class Constants {
             31,
             ANGLE_MOTOR_CONFIG,
             32,
-            Rotation2d.fromRotations(0.642334).getDegrees(),
+            Rotation2d.fromRotations(0.357422).getDegrees(),
             ANGLE_ENCODER_CONFIG
         );
 
