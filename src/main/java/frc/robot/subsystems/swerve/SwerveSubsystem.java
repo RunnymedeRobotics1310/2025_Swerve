@@ -48,6 +48,10 @@ public class SwerveSubsystem extends SubsystemBase {
         );
     }
 
+    public void periodic() {
+        drive.periodic();
+    }
+
     /*
      * *********************************************************************************************
      * Core methods for controlling the drivebase
@@ -153,15 +157,6 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public Pose2d getPose() {
         return drive.getPose();
-    }
-
-    /**
-     * Return the gyro rotation for the robot, with yaw adjusted for the configured offset
-     *
-     * @return adjusted rotation3d from the gyro
-     */
-    public Rotation3d getGyroRotation3d() {
-        return drive.getGyroRotation3d();
     }
 
     /**

@@ -10,9 +10,7 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 public class ExitZoneAutoCommand extends SequentialCommandGroup {
 
     public ExitZoneAutoCommand(SwerveSubsystem swerve, double delay) {
-
         addCommands(new WaitCommand(delay));
         addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(0, 1), new Rotation2d()));
-
     }
 }

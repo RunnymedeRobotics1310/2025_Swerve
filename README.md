@@ -24,7 +24,7 @@ If you are updating the RunnymedeSwerve library at the same time, then follow th
 
 The first time you build against a new library, run the following:
 ```bash
-./gradlew clean
+./gradlew clean && \
 ./gradlew compileJava
 ```
 which will fetch the latest version from your local repository.
