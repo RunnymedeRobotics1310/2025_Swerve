@@ -71,7 +71,7 @@ public final class Constants {
          */
         public static final double TRACK_WIDTH_METRES = inchesToMeters(21.75);
 
-        public static final double SDS_MK4I_WHEEL_RADIUS_M = 0.0051;
+        public static final double SDS_MK4I_WHEEL_RADIUS_M = 0.051;
 
         public static final SwerveTranslationConfig TRANSLATION_CONFIG = new SwerveTranslationConfig(
             0.02,
