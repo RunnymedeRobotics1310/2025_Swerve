@@ -184,6 +184,10 @@ public final class Constants {
 
         public static final SwerveTelemetry TELEMETRY = new SwerveTelemetry(4);
 
+        static {
+            TELEMETRY.enabled = true;
+        }
+
         public static final CoreSwerveConfig CORE_SWERVE_CONFIG = new CoreSwerveConfig(
             WHEEL_BASE_METRES,
             TRACK_WIDTH_METRES,
