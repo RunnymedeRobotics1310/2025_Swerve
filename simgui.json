@@ -46,7 +46,10 @@
           },
           "open": true
         },
-        "open": true
+        "open": true,
+        "swerve": {
+          "open": true
+        }
       }
     }
   },
@@ -64,6 +67,7 @@
       "Subscribers": {
         "open": true
       }
-    }
+    },
+    "visible": true
   }
 }

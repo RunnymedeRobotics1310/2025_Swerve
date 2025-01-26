@@ -39,7 +39,8 @@ public final class Constants {
          * Standard drive speed factor. Regular teleop drive will use this factor of the max
          * translational speed.
          */
-        public static final double GENERAL_SPEED_FACTOR = .6;
+        //        public static final double GENERAL_SPEED_FACTOR = .6;
+        public static final double GENERAL_SPEED_FACTOR = 1;
 
         /**
          * Maximum drive speed factor. When boosting, this factor will be multiplied against the
@@ -78,7 +79,7 @@ public final class Constants {
             1.0,
             4.79,
             4.79,
-            12.0,
+            42.0,
             1.2,
             0,
             0
@@ -86,7 +87,7 @@ public final class Constants {
 
         public static final SwerveRotationConfig ROTATION_CONFIG = new SwerveRotationConfig(
             /* min rot vel radPS */Rotation2d.fromDegrees(10).getRadians(),
-            /* max rot vel radPS */Rotation2d.fromRotations(1).getRadians(),
+            /* max rot vel radPS */Rotation2d.fromRotations(2).getRadians(),
             /* max rotation jump speed */Rotation2d.fromDegrees(205).getRadians(),
             /* slow zone */Rotation2d.fromDegrees(35).getRadians(),
             /* max rotation accel */Rotation2d.fromRotations(1310).getRadians(),

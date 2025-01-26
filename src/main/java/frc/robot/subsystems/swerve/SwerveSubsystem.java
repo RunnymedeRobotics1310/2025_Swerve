@@ -13,6 +13,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -67,9 +68,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
         // Use driveFieldOriented to avoid this.
 
-        x = xLimiter.calculate(x);
-        y = yLimiter.calculate(y);
-        w = omegaLimiter.calculate(w);
+        //        x = xLimiter.calculate(x);
+        //        y = yLimiter.calculate(y);
+        //        w = omegaLimiter.calculate(w);
 
         ChassisSpeeds safeVelocity = new ChassisSpeeds(x, y, w);
 
@@ -333,21 +334,25 @@ public class SwerveSubsystem extends SubsystemBase {
         Pose2d currentPose = drive.getPose();
         double targetRad = normalizeRotation(desiredHeading.getRadians());
         double currentRad = normalizeRotation(currentPose.getRotation().getRadians());
+        SmartDashboard.putNumber("computeOmega/1-targetRad", targetRad);
+        SmartDashboard.putNumber("computeOmega/2-currentRad", currentRad);
 
         double errorRad = targetRad - currentRad;
         errorRad = normalizeRotation(errorRad);
         double absErrRad = Math.abs(errorRad);
         double errSignum = Math.signum(errorRad);
 
-        final double omegaRad;
+        final double omegaRadPerSec;
         if (absErrRad < config.rotationConfig().toleranceRadians()) {
-            omegaRad = 0;
+            omegaRadPerSec = 0;
         } else if (absErrRad < config.rotationConfig().slowZoneRadians()) {
-            omegaRad = errSignum * config.rotationConfig().minRotVelocityRadPS();
+            omegaRadPerSec = errSignum * config.rotationConfig().minRotVelocityRadPS();
         } else {
-            omegaRad = errSignum * config.rotationConfig().maxJumpSpeedRadPS();
+            omegaRadPerSec = errSignum * config.rotationConfig().maxJumpSpeedRadPS();
         }
+        SmartDashboard.putNumber("computeOmega/3-errorRad", errorRad);
+        SmartDashboard.putNumber("computeOmega/4-omegaRadPerSec", omegaRadPerSec);
 
-        return Rotation2d.fromRadians(omegaRad);
+        return Rotation2d.fromRadians(omegaRadPerSec);
     }
 }

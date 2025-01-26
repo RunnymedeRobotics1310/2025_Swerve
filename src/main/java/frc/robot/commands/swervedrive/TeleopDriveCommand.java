@@ -23,10 +23,8 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 public class TeleopDriveCommand extends BaseDriveCommand {
 
     private final OperatorInput oi;
-    private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(4.42);
+    private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(9999999);
     private Rotation2d headingSetpoint = Rotation2d.fromDegrees(0);
-
-    private boolean lockOnSpeaker = false;
 
     /**
      * Used to drive a swerve robot in full field-centric mode.
@@ -78,11 +76,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // and may not be necessary. See below for details.
         final int rawDesiredHeadingDeg = oi.getPOV();
 
-        final boolean faceSpeaker = oi.isFaceSpeaker();
-        final Translation2d speaker = alliance == Alliance.Blue
-            ? Constants.BotTarget.BLUE_SPEAKER.getLocation().toTranslation2d()
-            : Constants.BotTarget.RED_SPEAKER.getLocation().toTranslation2d();
-
         // Compute boost factor
         final boolean isSlow = oi.isDriverLeftBumper();
         final boolean isFast = oi.isDriverRightBumper();
@@ -97,13 +90,11 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // User is steering!
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
-            lockOnSpeaker = false;
             double w = Math.pow(correctedCcwRotAngularVelPct, 3) * ROTATION_CONFIG.maxRotVelocityRadPS();
             omega = Rotation2d.fromRadians(w);
             // Save previous heading for when we are finished steering.
             headingSetpoint = swerve.getPose().getRotation();
         } else if (rawDesiredHeadingDeg > -1) {
-            lockOnSpeaker = false;
             // User wants to jump to POV
             // POV coordinates don't match field coordinates. POV is CW+ and field is CCW+. Also,
             // POV 0 is 90 degrees on the field (for blue alliance, and -90 for red).
@@ -116,20 +107,9 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             omega = swerve.computeOmega(desiredHeading);
             // Save the previous heading for when the jump is done
             headingSetpoint = desiredHeading;
-        } else if (faceSpeaker) {
-            Rotation2d desiredHeading = swerve.getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
-
-            omega = swerve.computeOmega(desiredHeading);
-            headingSetpoint = desiredHeading;
-            lockOnSpeaker = true;
         } else {
             // Translating only. Just drive on the last heading we knew.
-
-            if (lockOnSpeaker) {
-                headingSetpoint = swerve.getHeadingToFieldPosition(speaker).plus(Rotation2d.fromDegrees(180));
-            } else if (headingSetpoint == null) {
-                headingSetpoint = swerve.getPose().getRotation();
-            }
+            headingSetpoint = swerve.getPose().getRotation();
 
             omega = swerve.computeOmega(headingSetpoint);
         }
