@@ -74,16 +74,7 @@ public final class Constants {
 
         public static final double SDS_MK4I_WHEEL_RADIUS_M = 0.051;
 
-        public static final SwerveTranslationConfig TRANSLATION_CONFIG = new SwerveTranslationConfig(
-            0.02,
-            1.0,
-            4.79,
-            4.79,
-            42.0,
-            1.2,
-            0,
-            0
-        );
+        public static final SwerveTranslationConfig TRANSLATION_CONFIG = new SwerveTranslationConfig(0.02, 1.0, 5.3, 5.3, 42.0, 1.2, 0, 0);
 
         public static final SwerveRotationConfig ROTATION_CONFIG = new SwerveRotationConfig(
             /* min rot vel radPS */Rotation2d.fromDegrees(10).getRadians(),
@@ -186,7 +177,7 @@ public final class Constants {
         public static final SwerveTelemetry TELEMETRY = new SwerveTelemetry(4);
 
         static {
-            TELEMETRY.enabled = true;
+            TELEMETRY.enabled = !true;
         }
 
         public static final CoreSwerveConfig CORE_SWERVE_CONFIG = new CoreSwerveConfig(
