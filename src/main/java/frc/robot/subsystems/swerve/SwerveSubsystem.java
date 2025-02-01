@@ -5,6 +5,7 @@ import static ca.team1310.swerve.utils.SwerveUtils.normalizeRotation;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.SwerveTelemetry;
+import ca.team1310.swerve.gyro.GyroAwareSwerveDrive;
 import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
 import ca.team1310.swerve.utils.SwerveUtils;
 import ca.team1310.swerve.vision.VisionAwareSwerveDrive;
@@ -29,7 +30,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private final PIDController velocityPIDController;
 
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
-        this.drive = new FieldAwareSwerveDrive(config.coreConfig());
+        this.drive = new GyroAwareSwerveDrive(config.coreConfig());
+        //        this.drive = new FieldAwareSwerveDrive(config.coreConfig());
         //        this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
         this.config = config;
         this.telemetry = config.coreConfig().telemetry();
@@ -134,7 +136,7 @@ public class SwerveSubsystem extends SubsystemBase {
         double x = velocity.getX();
         double y = velocity.getY();
         double w = omega.getRadians();
-        Rotation2d theta = drive.getPose().getRotation();
+        Rotation2d theta = Rotation2d.fromDegrees(drive.getGyroYaw());
 
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
         driveSafely(chassisSpeeds);
