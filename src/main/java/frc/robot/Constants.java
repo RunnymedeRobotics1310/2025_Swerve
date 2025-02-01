@@ -39,8 +39,7 @@ public final class Constants {
          * Standard drive speed factor. Regular teleop drive will use this factor of the max
          * translational speed.
          */
-        //        public static final double GENERAL_SPEED_FACTOR = .6;
-        public static final double GENERAL_SPEED_FACTOR = 1;
+        public static final double GENERAL_SPEED_FACTOR = .6;
 
         /**
          * Maximum drive speed factor. When boosting, this factor will be multiplied against the
@@ -74,46 +73,55 @@ public final class Constants {
 
         public static final double SDS_MK4I_WHEEL_RADIUS_M = 0.051;
 
-        public static final SwerveTranslationConfig TRANSLATION_CONFIG = new SwerveTranslationConfig(0.02, 1.0, 20, 20, 42.0, 1.2, 0, 0);
+        public static final SwerveTranslationConfig TRANSLATION_CONFIG = new SwerveTranslationConfig(
+            /* tolerance (m) */0.02,
+            /* min speed (m/s) */1.0,
+            /* max speed (m/s) */20,
+            /* max module speed (m/s) */20,
+            /* max acceleration (m/s/s) */42.0,
+            /* velocity PID p */1.2,
+            /* velocity PID i */0,
+            /* velocity PID d */0
+        );
 
         public static final SwerveRotationConfig ROTATION_CONFIG = new SwerveRotationConfig(
-            /* min rot vel radPS */Rotation2d.fromDegrees(10).getRadians(),
-            /* max rot vel radPS */Rotation2d.fromRotations(2).getRadians(),
-            /* max rotation jump speed */Rotation2d.fromDegrees(205).getRadians(),
-            /* slow zone */Rotation2d.fromDegrees(35).getRadians(),
-            /* max rotation accel */Rotation2d.fromRotations(1310).getRadians(),
-            /* rotation tolerance */Rotation2d.fromDegrees(2).getRadians(),
-            0.8,
-            0,
-            0
+            /* min rot vel (rad/s) */Rotation2d.fromDegrees(10).getRadians(),
+            /* max rot vel (rad/s) */Rotation2d.fromRotations(2).getRadians(),
+            /* max rotation jump speed (rad/s) */Rotation2d.fromDegrees(205).getRadians(),
+            /* slow zone (rad) */Rotation2d.fromDegrees(35).getRadians(),
+            /* max rotation accel (rad/s/s) */Rotation2d.fromRotations(1310).getRadians(),
+            /* rotation tolerance (rad) */Rotation2d.fromDegrees(2).getRadians(),
+            /* heading PID p */0.8,
+            /* heading PID i */0,
+            /* heading PID d */0
         );
 
         private static final MotorConfig ANGLE_MOTOR_CONFIG = new MotorConfig(
-            MotorType.NEO_SPARK_MAX,
-            true,
-            20,
-            12,
-            0.25,
-            150.0 / 7/* SDS MK4i 150/7:1 */,
-            0.0125,
-            0,
-            0,
-            0,
-            0
+            /* motor hardware type */MotorType.NEO_SPARK_MAX,
+            /* inverted? */true,
+            /* current limit (A) */20,
+            /* nominal voltage (V) */12,
+            /* ramp rate 0 to full power (s)*/0.25,
+            /* angle motor gear ratio */150.0 / 7/* SDS MK4i 150/7:1 */,
+            /* angle motor PID p */0.0125,
+            /* angle motor PID i */0,
+            /* angle motor PID d */0,
+            /* angle motor PID ff */0,
+            /* angle motor PID izone */0
         );
 
         private static final MotorConfig DRIVE_MOTOR_CONFIG = new MotorConfig(
-            MotorType.NEO_SPARK_FLEX,
-            true,
-            40,
-            12,
-            0.25,
-            6.75/* SDS MK4i L2 --> 6.75:1 */,
-            0.11,
-            0,
-            0,
-            0,
-            0
+            /* motor hardware type */MotorType.NEO_SPARK_FLEX,
+            /* inverted? */true,
+            /* current limit (A) */40,
+            /* current limit (A) */12,
+            /* ramp rate 0 to full power (s)*/0.25,
+            /* drive motor gear ratio */6.75/* SDS MK4i L2 --> 6.75:1 */,
+            /* drive motor PID p */0.11,
+            /* drive motor PID i */0,
+            /* drive motor PID d */0,
+            /* drive motor PID ff */0,
+            /* drive motor PID izone */0
         );
 
         private static final EncoderConfig ANGLE_ENCODER_CONFIG = new EncoderConfig(false, 0.005, 5);
@@ -177,7 +185,7 @@ public final class Constants {
         public static final SwerveTelemetry TELEMETRY = new SwerveTelemetry(4);
 
         static {
-            TELEMETRY.enabled = !true;
+            TELEMETRY.enabled = true;
         }
 
         public static final CoreSwerveConfig CORE_SWERVE_CONFIG = new CoreSwerveConfig(
