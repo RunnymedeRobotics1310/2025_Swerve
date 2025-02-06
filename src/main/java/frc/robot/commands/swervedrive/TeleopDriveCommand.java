@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.commands.operator.OperatorInput;
@@ -111,10 +112,11 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             // Translating only. Just drive on the last heading we knew.
             headingSetpoint = swerve.getPose().getRotation();
 
-            omega = swerve.computeOmega(headingSetpoint);
+            omega = new Rotation2d(); //swerve.computeOmega(headingSetpoint);
         }
 
-        swerve.driveFieldOriented(velocity, omega);
+        //        swerve.driveFieldOriented(velocity, omega);
+        swerve.driveRobotOriented(new ChassisSpeeds(velocity.getX(), velocity.getY(), omega.getRadians()));
     }
 
     // Called once the command ends or is interrupted.

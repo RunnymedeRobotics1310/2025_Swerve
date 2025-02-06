@@ -1,14 +1,10 @@
 package frc.robot.subsystems.swerve;
 
-import static ca.team1310.swerve.utils.SwerveUtils.difference;
 import static ca.team1310.swerve.utils.SwerveUtils.normalizeRotation;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.SwerveTelemetry;
 import ca.team1310.swerve.gyro.GyroAwareSwerveDrive;
-import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
-import ca.team1310.swerve.utils.SwerveUtils;
-import ca.team1310.swerve.vision.VisionAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
@@ -22,20 +18,17 @@ public class SwerveSubsystem extends SubsystemBase {
     private final RunnymedeSwerveDrive drive;
     private final SwerveDriveSubsystemConfig config;
     private final SwerveTelemetry telemetry;
-    private final double maxTranslationSpeedMPS;
     private final SlewRateLimiter xLimiter;
     private final SlewRateLimiter yLimiter;
     private final SlewRateLimiter omegaLimiter;
     private final PIDController headingPIDController;
-    private final PIDController velocityPIDController;
 
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
-        //        this.drive = new GyroAwareSwerveDrive(config.coreConfig());
-        this.drive = new FieldAwareSwerveDrive(config.coreConfig());
+        this.drive = new GyroAwareSwerveDrive(config.coreConfig());
+        //        this.drive = new FieldAwareSwerveDrive(config.coreConfig());
         //        this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
         this.config = config;
         this.telemetry = config.coreConfig().telemetry();
-        this.maxTranslationSpeedMPS = config.coreConfig().maxAttainableTranslationSpeedMetresPerSecond();
         this.xLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.yLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.omegaLimiter = new SlewRateLimiter(config.rotationConfig().maxAccelerationRadPS2());
@@ -44,15 +37,10 @@ public class SwerveSubsystem extends SubsystemBase {
             config.rotationConfig().headingI(),
             config.rotationConfig().headingD()
         );
-        velocityPIDController = new PIDController(
-            config.translationConfig().velocityP(),
-            config.translationConfig().velocityI(),
-            config.translationConfig().velocityD()
-        );
     }
 
     public void periodic() {
-        drive.periodic();
+        drive.updateTelemetry(telemetry);
     }
 
     /*
@@ -70,14 +58,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
         // Use driveFieldOriented to avoid this.
 
-        //        x = xLimiter.calculate(x);
-        //        y = yLimiter.calculate(y);
-        //        w = omegaLimiter.calculate(w);
+        x = xLimiter.calculate(x);
+        y = yLimiter.calculate(y);
+        w = omegaLimiter.calculate(w);
 
         ChassisSpeeds safeVelocity = new ChassisSpeeds(x, y, w);
 
         if (this.config.enabled()) {
-            this.drive.drive(safeVelocity);
+            this.drive.drive(x, y, w);
         }
     }
 
@@ -136,7 +124,7 @@ public class SwerveSubsystem extends SubsystemBase {
         double x = velocity.getX();
         double y = velocity.getY();
         double w = omega.getRadians();
-        Rotation2d theta = Rotation2d.fromDegrees(drive.getGyroYaw());
+        Rotation2d theta = Rotation2d.fromDegrees(drive.getYaw());
 
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
         driveSafely(chassisSpeeds);
@@ -159,7 +147,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The robot's pose
      */
     public Pose2d getPose() {
-        return drive.getPose();
+        return new Pose2d();
     }
 
     /**
@@ -177,9 +165,7 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @param pose the new location and heading of the robot.
      */
-    public void resetOdometry(Pose2d pose) {
-        drive.resetOdometry(pose);
-    }
+    public void resetOdometry(Pose2d pose) {}
 
     /**
      * Set the desired module state for the named module. This should ONLY be used when testing
@@ -191,7 +177,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param desiredState the state of the specified module.
      */
     public void setModuleState(String moduleName, SwerveModuleState desiredState) {
-        drive.setModuleState(moduleName, desiredState);
+        //        drive.setModuleState(moduleName, desiredState);
     }
 
     @Override
@@ -209,122 +195,6 @@ public class SwerveSubsystem extends SubsystemBase {
      */
 
     /**
-     * Determine if the robot is close enough to the desired heading to stop rotating.
-     */
-    public boolean isCloseEnough(Rotation2d desiredHeading) {
-        return SwerveUtils.isCloseEnough(
-            drive.getPose().getRotation().getRadians(),
-            desiredHeading.getRadians(),
-            config.rotationConfig().toleranceRadians()
-        );
-    }
-
-    /**
-     * Determine if the robot is close enough to the desired location to stop moving.
-     */
-    public boolean isCloseEnough(Translation2d desiredLocation) {
-        return SwerveUtils.isCloseEnough(drive.getPose().getTranslation(), desiredLocation, config.translationConfig().toleranceMetres());
-    }
-
-    /**
-     * Determine if the robot is close enough to the desired pose to stop moving.
-     */
-    public boolean isCloseEnough(Pose2d desiredPose) {
-        return isCloseEnough(desiredPose.getTranslation()) && isCloseEnough(desiredPose.getRotation());
-    }
-
-    /**
-     * Compute the distance to the specified field position in metres.
-     */
-    public double getDistanceToFieldPositionMetres(Translation2d target) {
-        return drive.getPose().getTranslation().getDistance(target);
-    }
-
-    /**
-     * Compute the heading required to face the specified position on the field.
-     *
-     * @param target field position
-     * @return the heading toward that position.
-     */
-    public Rotation2d getHeadingToFieldPosition(Translation2d target) {
-        Translation2d currentRobotLocation = drive.getPose().getTranslation();
-        Translation2d delta = target.minus(currentRobotLocation);
-        return delta.getAngle();
-    }
-
-    /**
-     * Drive as fast as safely possible to the specified pose, up ot the max speed specified.
-     *
-     * @param desiredPose the desired location on the field
-     */
-    public final void driveToFieldPose(Pose2d desiredPose, double maxSpeedMPS) {
-        Pose2d current = getPose();
-        Transform2d delta = difference(desiredPose, current);
-
-        Translation2d velocity = computeVelocity(delta.getTranslation(), maxSpeedMPS);
-        Rotation2d omega = computeOmega(desiredPose.getRotation());
-
-        this.telemetry.fieldOrientedDeltaToPoseX = delta.getX();
-        this.telemetry.fieldOrientedDeltaToPoseY = delta.getY();
-        this.telemetry.fieldOrientedDeltaToPoseHeading = delta.getRotation().getDegrees();
-
-        driveFieldOrientedInternal(velocity, omega);
-    }
-
-    /**
-     * Return a velocity that will traverse the specified translation as fast as possible without
-     * overshooting the location. The initial speed is expected to be 0 and the final speed is
-     * expected to be 0.
-     *
-     * @param translationToTravel the desired translation to travel
-     * @param maxSpeed the maximum speed to travel in Metres per Second
-     * @return the velocity vector, in metres per second that the robot can safely travel
-     * to traverse the distance specified
-     */
-    private Translation2d computeVelocity(Translation2d translationToTravel, double maxSpeed) {
-        // todo: replace with PID
-        double distanceMetres = translationToTravel.getNorm();
-
-        // don't worry about tiny translations
-        if (distanceMetres < config.translationConfig().toleranceMetres()) {
-            return new Translation2d();
-        }
-
-        // safety code
-        if (maxSpeed > maxTranslationSpeedMPS) {
-            maxSpeed = maxTranslationSpeedMPS;
-        }
-
-        // ensure that we have enough room to decelerate
-        double decelDistance = Math.pow(maxTranslationSpeedMPS, 2) / (2 * config.translationConfig().maxAccelMPS2());
-        double decelDistRatio = distanceMetres / decelDistance;
-        if (decelDistRatio < 1) {
-            maxSpeed *= decelDistRatio;
-        }
-
-        double speed;
-        if (distanceMetres >= decelDistance) {
-            // cruising
-            speed = maxSpeed;
-        } else {
-            // decelerating
-            double pctToGo = distanceMetres / decelDistance;
-            speed = maxSpeed * pctToGo * velocityPIDController.getP();
-        }
-
-        // Confirm speed is not too slow to move
-        if (speed < config.translationConfig().minSpeedMPS()) {
-            speed = config.translationConfig().minSpeedMPS();
-        }
-
-        Rotation2d angle = translationToTravel.getAngle();
-
-        double xSign = Math.signum(translationToTravel.getX());
-        double ySign = Math.signum(translationToTravel.getY());
-        return new Translation2d(xSign * speed * Math.abs(angle.getCos()), ySign * speed * Math.abs(angle.getSin()));
-    }
-
-    /**
      * Utility function to compute the required rotation speed of the robot given the heading
      * provided.
      *
@@ -333,9 +203,9 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public Rotation2d computeOmega(Rotation2d desiredHeading) {
         // todo: replace with PID
-        Pose2d currentPose = drive.getPose();
+
         double targetRad = normalizeRotation(desiredHeading.getRadians());
-        double currentRad = normalizeRotation(currentPose.getRotation().getRadians());
+        double currentRad = normalizeRotation(Math.toRadians(drive.getYaw()));
         SmartDashboard.putNumber("computeOmega/1-targetRad", targetRad);
         SmartDashboard.putNumber("computeOmega/2-currentRad", currentRad);
 
