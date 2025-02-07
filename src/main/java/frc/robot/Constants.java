@@ -8,6 +8,7 @@ import static edu.wpi.first.math.util.Units.inchesToMeters;
 
 import ca.team1310.swerve.SwerveTelemetry;
 import ca.team1310.swerve.core.config.*;
+import ca.team1310.swerve.utils.Coordinates;
 import ca.team1310.swerve.vision.VisionConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -85,13 +86,9 @@ public final class Constants {
         );
 
         public static final SwerveRotationConfig ROTATION_CONFIG = new SwerveRotationConfig(
-            /* min rot vel (rad/s) */Rotation2d.fromDegrees(5).getRadians(),
-            /* max rot vel (rad/s) */Rotation2d.fromRotations(2).getRadians(),
-            /* max rotation jump speed (rad/s) */Rotation2d.fromDegrees(90).getRadians(),
-            /* slow zone (rad) */Rotation2d.fromDegrees(35).getRadians(),
-            /* max rotation accel (rad/s/s) */Rotation2d.fromRotations(1310).getRadians(),
-            /* rotation tolerance (rad) */Rotation2d.fromDegrees(2).getRadians(),
-            /* heading PID p */0.8,
+            /* max rot vel (rad/s) */Rotation2d.fromRotations(1).getRadians(),
+            /* max rotation accel (rad/s/s) */Rotation2d.fromRotations(4).getRadians(),
+            /* heading PID p */0.005,
             /* heading PID i */0,
             /* heading PID d */0
         );
@@ -128,8 +125,7 @@ public final class Constants {
 
         public static final ModuleConfig FRONT_LEFT = new ModuleConfig(
             "frontleft",
-            TRACK_WIDTH_METRES / 2,
-            WHEEL_BASE_METRES / 2,
+            new Coordinates(TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2),
             SDS_MK4I_WHEEL_RADIUS_M,
             10,
             DRIVE_MOTOR_CONFIG,
@@ -142,8 +138,7 @@ public final class Constants {
 
         public static final ModuleConfig FRONT_RIGHT = new ModuleConfig(
             "frontright",
-            TRACK_WIDTH_METRES / 2,
-            -WHEEL_BASE_METRES / 2,
+            new Coordinates(TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2),
             SDS_MK4I_WHEEL_RADIUS_M,
             20,
             DRIVE_MOTOR_CONFIG,
@@ -156,8 +151,7 @@ public final class Constants {
 
         public static final ModuleConfig BACK_LEFT = new ModuleConfig(
             "backleft",
-            -TRACK_WIDTH_METRES / 2,
-            WHEEL_BASE_METRES / 2,
+            new Coordinates(-TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2),
             SDS_MK4I_WHEEL_RADIUS_M,
             35,
             DRIVE_MOTOR_CONFIG,
@@ -170,8 +164,7 @@ public final class Constants {
 
         public static final ModuleConfig BACK_RIGHT = new ModuleConfig(
             "backright",
-            -TRACK_WIDTH_METRES / 2,
-            -WHEEL_BASE_METRES / 2,
+            new Coordinates(-TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2),
             SDS_MK4I_WHEEL_RADIUS_M,
             30,
             DRIVE_MOTOR_CONFIG,

@@ -12,20 +12,18 @@ import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
 import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class TeleopDriveCommand extends BaseDriveCommand {
 
     private final OperatorInput oi;
-    private final SlewRateLimiter inputOmegaLimiter = new SlewRateLimiter(9999999);
-    private Rotation2d headingSetpoint = Rotation2d.fromDegrees(0);
+    private Rotation2d headingSetpoint = null;
+    private boolean fieldOriented = true;
 
     /**
      * Used to drive a swerve robot in full field-centric mode.
@@ -45,9 +43,10 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     public void execute() {
         super.execute();
 
-        // The FRC field-oriented ccoordinate system
+        // The FRC field-oriented coordinate system
         // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
         final Alliance alliance = getRunnymedeAlliance();
+        SmartDashboard.putString("1310/Alliance", alliance.toString());
 
         // The coordinate system defines (0,0) as the right side of the blue alliance wall. The
         // x-axis is positive toward the red alliance, and the y-axis is positive to the left.
@@ -72,11 +71,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // Therefore, negative x stick value maps to positive rotation on the field.
         final double ccwRotAngularVelPct = -oi.getDriverControllerAxis(RIGHT, X);
 
-        // User wants to jump directly to a specific heading. Computation is deferred because it is
-        // complex
-        // and may not be necessary. See below for details.
-        final int rawDesiredHeadingDeg = oi.getPOV();
-
         // Compute boost factor
         final boolean isSlow = oi.isDriverLeftBumper();
         final boolean isFast = oi.isDriverRightBumper();
@@ -84,39 +78,33 @@ public class TeleopDriveCommand extends BaseDriveCommand {
 
         Translation2d velocity = calculateTeleopVelocity(vX, vY, boostFactor, invert);
 
-        Rotation2d omega;
+        final double omegaRadiansPerSecond;
 
-        double correctedCcwRotAngularVelPct = inputOmegaLimiter.calculate(ccwRotAngularVelPct);
+        double correctedCcwRotAngularVelPct = ccwRotAngularVelPct;
 
         // User is steering!
         if (correctedCcwRotAngularVelPct != 0) {
             // Compute omega
-            double w = Math.pow(correctedCcwRotAngularVelPct, 3) * ROTATION_CONFIG.maxRotVelocityRadPS();
-            omega = Rotation2d.fromRadians(w);
+            omegaRadiansPerSecond = Math.pow(correctedCcwRotAngularVelPct, 3) * ROTATION_CONFIG.maxRotVelocityRadPS();
             // Save previous heading for when we are finished steering.
             headingSetpoint = swerve.getPose().getRotation();
-        } else if (rawDesiredHeadingDeg > -1) {
-            // User wants to jump to POV
-            // POV coordinates don't match field coordinates. POV is CW+ and field is CCW+. Also,
-            // POV 0 is 90 degrees on the field (for blue alliance, and -90 for red).
-            // Invert and rotate as required.
-            // BLUE field = MOD(-POV + 360, 360)
-            // RED field = MOD(-POV + 180 + 360, 360)
-            double correctedHeadingDeg = ((rawDesiredHeadingDeg * -1) + (invert ? 180 : 0) + 360) % 360;
-            Rotation2d desiredHeading = Rotation2d.fromDegrees(correctedHeadingDeg);
-
-            omega = swerve.computeOmega(desiredHeading);
-            // Save the previous heading for when the jump is done
-            headingSetpoint = desiredHeading;
         } else {
             // Translating only. Just drive on the last heading we knew.
-            headingSetpoint = swerve.getPose().getRotation();
-
-            omega = new Rotation2d(); //swerve.computeOmega(headingSetpoint);
+            if (headingSetpoint == null) {
+                headingSetpoint = swerve.getPose().getRotation();
+            }
+            // todo: after yawRate() drops to zero, we should reset headingSetpoint to the current heading
+            //            omegaRadiansPerSecond = swerve.computeOmega(headingSetpoint.getDegrees());
+            omegaRadiansPerSecond = 0;
         }
 
-        //        swerve.driveFieldOriented(velocity, omega);
-        swerve.driveRobotOriented(new ChassisSpeeds(velocity.getX(), velocity.getY(), omega.getRadians()));
+        if (fieldOriented) {
+            // Field-oriented mode
+            swerve.driveFieldOriented(velocity.getX(), velocity.getY(), omegaRadiansPerSecond);
+        } else {
+            // Robot-oriented mode
+            swerve.driveRobotOriented(velocity.getX(), velocity.getY(), omegaRadiansPerSecond);
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -143,7 +131,10 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // handy utilities
         Translation2d input = new Translation2d(vX, vY);
         double magnitude = input.getNorm();
-        Rotation2d angle = magnitude > 1e-6 ? input.getAngle() : new Rotation2d(); // todo: bug: not safe - invalid if magnitude is 0
+        Rotation2d angle = magnitude > 1e-6 ? input.getAngle() : new Rotation2d();
+
+        // apply boost factor
+        magnitude *= boostFactor;
 
         // handle case where in simulator, a value of 1,1 is possible whereas normally the
         // controller magnitude never exceeds 1
@@ -153,7 +144,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         magnitude = Math.pow(magnitude, 3);
 
         // convert from % to mps
-        magnitude = magnitude * boostFactor * TRANSLATION_CONFIG.maxSpeedMPS();
+        magnitude *= TRANSLATION_CONFIG.maxSpeedMPS();
 
         // convert to vector
         return new Translation2d(magnitude, angle);

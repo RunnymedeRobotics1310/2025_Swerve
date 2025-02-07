@@ -12,6 +12,11 @@
       "/SmartDashboard/Field": "Field2d"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "bottom": 1638,
         "builtin": "2025 Reefscape",
@@ -46,8 +51,17 @@
           },
           "open": true
         },
+        "Field": {
+          "double[]##v_/SmartDashboard/Field/XModules": {
+            "open": true
+          },
+          "open": true
+        },
         "open": true,
         "swerve": {
+          "double[]##v_/SmartDashboard/swerve/wheelLocations": {
+            "open": true
+          },
           "open": true
         }
       }
