@@ -69,7 +69,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // heading. Positive x values on the stick translate to clockwise motion, and vice versa.
         // The coordinate system has positive motion as CCW.
         // Therefore, negative x stick value maps to positive rotation on the field.
-        final double ccwRotAngularVelPct = -oi.getDriverControllerAxis(RIGHT, X)*0.65;
+        final double ccwRotAngularVelPct = oi.getDriverControllerAxis(RIGHT, X)*0.65;
 
         // Compute boost factor
         final boolean isSlow = oi.isDriverLeftBumper();
