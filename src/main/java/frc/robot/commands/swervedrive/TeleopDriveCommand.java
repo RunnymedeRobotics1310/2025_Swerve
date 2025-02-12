@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -24,6 +25,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     private final OperatorInput oi;
     private Rotation2d headingSetpoint = null;
     private boolean fieldOriented = true;
+    private Timer rotationSettleTimer = new Timer();
 
     /**
      * Used to drive a swerve robot in full field-centric mode.
@@ -69,7 +71,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // heading. Positive x values on the stick translate to clockwise motion, and vice versa.
         // The coordinate system has positive motion as CCW.
         // Therefore, negative x stick value maps to positive rotation on the field.
-        final double ccwRotAngularVelPct = oi.getDriverControllerAxis(RIGHT, X)*0.65;
+        final double ccwRotAngularVelPct = oi.getDriverControllerAxis(RIGHT, X) * 0.65;
 
         // Compute boost factor
         final boolean isSlow = oi.isDriverLeftBumper();
@@ -79,24 +81,27 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         Translation2d velocity = calculateTeleopVelocity(vX, vY, boostFactor, invert);
 
         final double omegaRadiansPerSecond;
-
         double correctedCcwRotAngularVelPct = ccwRotAngularVelPct;
 
-        // User is steering!
+        //Compute Omega
         if (correctedCcwRotAngularVelPct != 0) {
-            // Compute omega
+            // User is steering!
             omegaRadiansPerSecond = Math.pow(correctedCcwRotAngularVelPct, 3) * ROTATION_CONFIG.maxRotVelocityRadPS();
-            // Save previous heading for when we are finished steering.
-            headingSetpoint = swerve.getPose().getRotation();
+            // Save previous heading for when we are finished steering and slow enough.
+            //            headingSetpoint = Rotation2d.fromDegrees(swerve.getYaw());
+            rotationSettleTimer.reset();
         } else {
-            // Translating only. Just drive on the last heading we knew.
-            if (headingSetpoint == null) {
-                headingSetpoint = swerve.getPose().getRotation();
+            // Translating only. Just drive on robot yaw
+            //TODO: tune timer duration
+            if (headingSetpoint == null && rotationSettleTimer.hasElapsed(0.5)) {
+                headingSetpoint = Rotation2d.fromDegrees(swerve.getYaw());
+                omegaRadiansPerSecond = -swerve.computeOmega(headingSetpoint.getDegrees());
+            } else {
+                omegaRadiansPerSecond = 0;
             }
-            // todo: after yawRate() drops to zero, we should reset headingSetpoint to the current heading
-            //            omegaRadiansPerSecond = swerve.computeOmega(headingSetpoint.getDegrees());
-            omegaRadiansPerSecond = 0;
         }
+
+        //        log("Yaw: " + swerve.getYaw() + " Setpoint: " + headingSetpoint.getDegrees());
 
         if (fieldOriented) {
             // Field-oriented mode

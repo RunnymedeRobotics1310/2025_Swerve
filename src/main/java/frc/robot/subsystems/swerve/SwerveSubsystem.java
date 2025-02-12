@@ -36,6 +36,8 @@ public class SwerveSubsystem extends SubsystemBase {
             config.rotationConfig().headingI(),
             config.rotationConfig().headingD()
         );
+        headingPIDController.enableContinuousInput(-180, 180);
+        headingPIDController.setTolerance(1);
     }
 
     public void periodic() {
@@ -148,6 +150,14 @@ public class SwerveSubsystem extends SubsystemBase {
         return new Pose2d(); // todo: fixme:
     }
 
+    public double getYaw() {
+        return drive.getYaw();
+    }
+
+    public double getYawRate() {
+        return drive.getYawRate();
+    }
+
     /**
      * Resets the gyro angle to zero and resets odometry to the same position, but
      * facing toward 0.
@@ -204,5 +214,6 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public double computeOmega(double desiredHeadingDegrees) {
         return headingPIDController.calculate(drive.getYaw(), desiredHeadingDegrees);
+        //        return (desiredHeadingDegrees - drive.getYaw()) * config.rotationConfig().headingP();
     }
 }
