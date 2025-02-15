@@ -56,7 +56,7 @@ public class OperatorInput {
         return driverController;
     }
 
-    public boolean isDriverLeftBumper() {
+    public boolean getRotate180Val() {
         return driverController.getLeftBumperButton();
     }
 
@@ -66,6 +66,10 @@ public class OperatorInput {
 
     public boolean isFaceSpeaker() {
         return driverController.getYButton();
+    }
+
+    public boolean isZeroGyro() {
+        return driverController.getBackButton();
     }
 
     public boolean isCancel() {
@@ -115,7 +119,7 @@ public class OperatorInput {
         // Enter Test Mode (Start and Back pressed at the same time)
         new Trigger(() -> (isToggleTestMode())).onTrue(new SystemTestCommand(this, driveSubsystem));
 
-        new Trigger(driverController::getBackButton).onTrue(new ZeroGyroCommand(driveSubsystem));
+        new Trigger(() -> (isZeroGyro())).onTrue(new ZeroGyroCommand(driveSubsystem));
         new Trigger(this::isCancel).whileTrue(new CancelCommand(driveSubsystem));
         new Trigger(driverController::getXButton).whileTrue(
             new ResetOdometryCommand(driveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0)))

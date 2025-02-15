@@ -88,7 +88,7 @@ public final class Constants {
         public static final SwerveRotationConfig ROTATION_CONFIG = new SwerveRotationConfig(
             /* max rot vel (rad/s) */Rotation2d.fromRotations(1).getRadians(),
             /* max rotation accel (rad/s/s) */Rotation2d.fromRotations(4).getRadians(),
-            /* heading PID p */0.05, // Rads/Deg
+            /* heading PID p */0.025, // Rads/Deg
             /* heading PID i */0,
             /* heading PID d */0
         );
