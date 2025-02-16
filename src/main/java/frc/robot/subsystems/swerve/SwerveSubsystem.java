@@ -1,20 +1,18 @@
 package frc.robot.subsystems.swerve;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
-import ca.team1310.swerve.SwerveTelemetry;
 import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.telemetry.Telemetry;
 
 public class SwerveSubsystem extends SubsystemBase {
 
     private final RunnymedeSwerveDrive drive;
     private final SwerveDriveSubsystemConfig config;
-    private final SwerveTelemetry telemetry;
     private final SlewRateLimiter xLimiter;
     private final SlewRateLimiter yLimiter;
     private final SlewRateLimiter omegaLimiter;
@@ -23,7 +21,6 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
         this.drive = new FieldAwareSwerveDrive(config.coreConfig(), null);
         this.config = config;
-        this.telemetry = config.coreConfig().telemetry();
         this.xLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.yLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.omegaLimiter = new SlewRateLimiter(config.rotationConfig().maxAccelerationRadPS2());
@@ -34,10 +31,6 @@ public class SwerveSubsystem extends SubsystemBase {
         );
         headingPIDController.enableContinuousInput(-180, 180);
         headingPIDController.setTolerance(2);
-    }
-
-    public void periodic() {
-        drive.updateTelemetry(telemetry);
     }
 
     /*
@@ -74,12 +67,12 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param omega rad/s
      */
     public final void driveRobotOriented(double x, double y, double omega) {
-        this.telemetry.fieldOrientedVelocityX = 0;
-        this.telemetry.fieldOrientedVelocityY = 0;
-        this.telemetry.fieldOrientedVelocityOmega = 0;
-        this.telemetry.fieldOrientedDeltaToPoseX = 0;
-        this.telemetry.fieldOrientedDeltaToPoseY = 0;
-        this.telemetry.fieldOrientedDeltaToPoseHeading = 0;
+        Telemetry.drive.fieldOrientedVelocityX = 0;
+        Telemetry.drive.fieldOrientedVelocityY = 0;
+        Telemetry.drive.fieldOrientedVelocityOmega = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseX = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseY = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseHeading = 0;
 
         driveSafely(x, y, omega);
     }
@@ -101,9 +94,9 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param omega the rotation rate of the heading of the robot in radians per second. CCW positive.
      */
     public final void driveFieldOriented(double x, double y, double omega) {
-        this.telemetry.fieldOrientedDeltaToPoseX = 0;
-        this.telemetry.fieldOrientedDeltaToPoseY = 0;
-        this.telemetry.fieldOrientedDeltaToPoseHeading = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseX = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseY = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseHeading = 0;
 
         driveFieldOrientedInternal(x, y, omega);
     }
@@ -116,9 +109,9 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param omega
      */
     private void driveFieldOrientedInternal(double x, double y, double omega) {
-        this.telemetry.fieldOrientedVelocityX = x;
-        this.telemetry.fieldOrientedVelocityY = y;
-        this.telemetry.fieldOrientedVelocityOmega = omega;
+        Telemetry.drive.fieldOrientedVelocityX = x;
+        Telemetry.drive.fieldOrientedVelocityY = y;
+        Telemetry.drive.fieldOrientedVelocityOmega = omega;
 
         Rotation2d theta = Rotation2d.fromDegrees(drive.getYaw());
 

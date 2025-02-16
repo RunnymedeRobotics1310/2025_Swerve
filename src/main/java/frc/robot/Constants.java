@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
-import ca.team1310.swerve.SwerveTelemetry;
 import ca.team1310.swerve.core.config.*;
 import ca.team1310.swerve.utils.Coordinates;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -174,12 +173,6 @@ public final class Constants {
             ANGLE_ENCODER_CONFIG
         );
 
-        public static final SwerveTelemetry TELEMETRY = new SwerveTelemetry(4);
-
-        static {
-            TELEMETRY.enabled = true;
-        }
-
         public static final CoreSwerveConfig CORE_SWERVE_CONFIG = new CoreSwerveConfig(
             WHEEL_BASE_METRES,
             TRACK_WIDTH_METRES,
@@ -192,7 +185,7 @@ public final class Constants {
             FRONT_RIGHT,
             BACK_LEFT,
             BACK_RIGHT,
-            TELEMETRY
+            TelemetryLevel.CALCULATED
         );
 
         public static final SwerveDriveSubsystemConfig SUBSYSTEM_CONFIG = new SwerveDriveSubsystemConfig(

@@ -24,6 +24,7 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 public class TeleopDriveCommand extends BaseDriveCommand {
 
     private final OperatorInput oi;
+    private boolean invert;
     private Double headingSetpointDeg = null;
     private boolean fieldOriented = true;
     private Timer rotationSettleTimer = new Timer();
@@ -41,12 +42,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     public void initialize() {
         super.initialize();
         rotationSettleTimer.start();
-    }
-
-    // Called every time the scheduler runs while the command is scheduled.
-    //    @Override
-    public void execute() {
-        super.execute();
 
         // The FRC field-oriented coordinate system
         // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
@@ -57,7 +52,13 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // x-axis is positive toward the red alliance, and the y-axis is positive to the left.
         // When the robot is on the red alliance, we need to invert inputs for the stick values
         // to move the robot in the right direction.
-        final boolean invert = alliance == Alliance.Red;
+        this.invert = alliance == Alliance.Red;
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    //    @Override
+    public void execute() {
+        super.execute();
 
         final boolean isZeroGyro = oi.isZeroGyro();
 

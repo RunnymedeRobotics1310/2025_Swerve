@@ -9,7 +9,9 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/1310/Gyro": "Gyro",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Gyro": "Gyro"
     },
     "windows": {
       "/FMSInfo": {
@@ -43,6 +45,12 @@
       },
       "SmartDashboard": {
         "1310": {
+          "Drive": {
+            "open": true
+          },
+          "Gyro": {
+            "open": true
+          },
           "Swerve": {
             "open": true
           },
@@ -55,6 +63,9 @@
           "double[]##v_/SmartDashboard/Field/XModules": {
             "open": true
           },
+          "open": true
+        },
+        "Gyro": {
           "open": true
         },
         "open": true,
