@@ -2,14 +2,12 @@ package frc.robot.subsystems.swerve;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.SwerveTelemetry;
-import ca.team1310.swerve.gyro.GyroAwareSwerveDrive;
 import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -23,9 +21,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private final PIDController headingPIDController;
 
     public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
-        //        this.drive = new GyroAwareSwerveDrive(config.coreConfig());
-        this.drive = new FieldAwareSwerveDrive(config.coreConfig());
-        //        this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
+        this.drive = new FieldAwareSwerveDrive(config.coreConfig(), null);
         this.config = config;
         this.telemetry = config.coreConfig().telemetry();
         this.xLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
@@ -37,7 +33,7 @@ public class SwerveSubsystem extends SubsystemBase {
             config.rotationConfig().headingD()
         );
         headingPIDController.enableContinuousInput(-180, 180);
-        headingPIDController.setTolerance(1);
+        headingPIDController.setTolerance(2);
     }
 
     public void periodic() {
@@ -147,7 +143,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The robot's pose
      */
     public Pose2d getPose() {
-        return new Pose2d(); // todo: fixme:
+        return drive.getPose(); // todo: fixme:
     }
 
     public double getYaw() {
@@ -174,7 +170,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @param pose the new location and heading of the robot.
      */
     public void resetOdometry(Pose2d pose) {
-        // todo: fixme:
+        drive.resetOdometry(pose);
     }
 
     /**
@@ -184,11 +180,11 @@ public class SwerveSubsystem extends SubsystemBase {
      * This SHOULD NOT be called during normal operation - it is designed for TEST MODE ONLY!
      *
      * @param moduleName the module to activate
-     * @param desiredState the state of the specified module.
+     * @param speed in m/s
+     * @param angle in degrees
      */
-    public void setModuleState(String moduleName, SwerveModuleState desiredState) {
-        // todo: fixme:
-        //        drive.setModuleState(moduleName, desiredState);
+    public void setModuleState(String moduleName, double speed, double angle) {
+        drive.setModuleState(moduleName, speed, angle);
     }
 
     @Override

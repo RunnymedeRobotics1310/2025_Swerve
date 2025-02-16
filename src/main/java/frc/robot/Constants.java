@@ -9,7 +9,6 @@ import static edu.wpi.first.math.util.Units.inchesToMeters;
 import ca.team1310.swerve.SwerveTelemetry;
 import ca.team1310.swerve.core.config.*;
 import ca.team1310.swerve.utils.Coordinates;
-import ca.team1310.swerve.vision.VisionConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -196,21 +195,9 @@ public final class Constants {
             TELEMETRY
         );
 
-        public static final VisionConfig VISION_CONFIG = new VisionConfig(
-            0,
-            0,
-            FieldConstants.FIELD_EXTENT_METRES_X,
-            FieldConstants.FIELD_EXTENT_METRES_Y,
-            0.7,
-            0.1,
-            .5,
-            "hugh"
-        );
-
         public static final SwerveDriveSubsystemConfig SUBSYSTEM_CONFIG = new SwerveDriveSubsystemConfig(
             true,
             CORE_SWERVE_CONFIG,
-            VISION_CONFIG,
             TRANSLATION_CONFIG,
             ROTATION_CONFIG
         );
