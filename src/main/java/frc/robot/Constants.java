@@ -185,7 +185,7 @@ public final class Constants {
             FRONT_RIGHT,
             BACK_LEFT,
             BACK_RIGHT,
-            TelemetryLevel.CALCULATED
+            TelemetryLevel.VERBOSE
         );
 
         public static final SwerveDriveSubsystemConfig SUBSYSTEM_CONFIG = new SwerveDriveSubsystemConfig(
