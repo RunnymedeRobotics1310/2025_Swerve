@@ -27,16 +27,16 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
                 }
-//                frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-//                    // Enable VisualVM connection
-//                    jvmArgs.add("-Dcom.sun.management.jmxremote=true")
-//                    jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
-//                    jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
-//                    jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
-//                    jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-////                    jvmArgs.add("-Djava.rmi.server.hostname=10.TE.AM.2") // Replace TE.AM with team number
-//                    jvmArgs.add("-Djava.rmi.server.hostname=10.13.10.2") // Replace TE.AM with team number
-//                }
+                frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                    // Enable VisualVM connection
+                    jvmArgs.add("-Dcom.sun.management.jmxremote=true")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
+                    jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
+//                  jvmArgs.add("-Djava.rmi.server.hostname=10.TE.AM.2") // Replace TE.AM with team number
+                    jvmArgs.add("-Djava.rmi.server.hostname=10.13.10.2") // Replace TE.AM with team number
+                }
                 // Static files artifact
                 frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
                     files = project.fileTree('src/main/deploy')
@@ -78,7 +78,7 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
-    implementation 'ca.team1310:swerve:2.4.5.11'
+    implementation 'ca.team1310:swerve:3.0.1.23'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

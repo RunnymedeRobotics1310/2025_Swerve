@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CancelCommand;
-import frc.robot.commands.swervedrive.DriveDistanceCommand;
-import frc.robot.commands.swervedrive.DriveToPositionCommand;
 import frc.robot.commands.swervedrive.ResetOdometryCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.commands.test.SystemTestCommand;
@@ -58,7 +56,7 @@ public class OperatorInput {
         return driverController;
     }
 
-    public boolean isDriverLeftBumper() {
+    public boolean getRotate180Val() {
         return driverController.getLeftBumperButton();
     }
 
@@ -68,6 +66,10 @@ public class OperatorInput {
 
     public boolean isFaceSpeaker() {
         return driverController.getYButton();
+    }
+
+    public boolean isZeroGyro() {
+        return driverController.getBackButton();
     }
 
     public boolean isCancel() {
@@ -117,23 +119,16 @@ public class OperatorInput {
         // Enter Test Mode (Start and Back pressed at the same time)
         new Trigger(() -> (isToggleTestMode())).onTrue(new SystemTestCommand(this, driveSubsystem));
 
-        new Trigger(driverController::getBackButton).onTrue(new ZeroGyroCommand(driveSubsystem));
+        new Trigger(() -> (isZeroGyro())).onTrue(new ZeroGyroCommand(driveSubsystem));
         new Trigger(this::isCancel).whileTrue(new CancelCommand(driveSubsystem));
         new Trigger(driverController::getXButton).whileTrue(
             new ResetOdometryCommand(driveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0)))
         );
-
-        // drive forward
-        Translation2d fwd = new Translation2d(0, 7);
-        Rotation2d fwdHeading = Rotation2d.fromDegrees(0);
-        DriveDistanceCommand ddc = new DriveDistanceCommand(driveSubsystem, fwd, fwdHeading, 3);
-        new Trigger(driverController::getAButton).onTrue(ddc);
-
         // drive to position test
-        Translation2d location = new Translation2d(2, 2);
-        Rotation2d heading = Rotation2d.fromDegrees(-20);
-        Pose2d desiredPose = new Pose2d(location, heading);
-        DriveToPositionCommand dtpc = new DriveToPositionCommand(driveSubsystem, BLUE_2_2_20, RED_2_2_20);
-        new Trigger(driverController::getBButton).onTrue(dtpc);
+        //        Translation2d location = new Translation2d(2, 2);
+        //        Rotation2d heading = Rotation2d.fromDegrees(-20);
+        //        Pose2d desiredPose = new Pose2d(location, heading);
+        //        DriveToPositionCommand dtpc = new DriveToPositionCommand(driveSubsystem, BLUE_2_2_20, RED_2_2_20);
+        //        new Trigger(driverController::getBButton).onTrue(dtpc);
     }
 }

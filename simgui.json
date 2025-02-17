@@ -9,9 +9,16 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/1310/Gyro": "Gyro",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Gyro": "Gyro"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "bottom": 1638,
         "builtin": "2025 Reefscape",
@@ -38,6 +45,12 @@
       },
       "SmartDashboard": {
         "1310": {
+          "Drive": {
+            "open": true
+          },
+          "Gyro": {
+            "open": true
+          },
           "Swerve": {
             "open": true
           },
@@ -46,8 +59,20 @@
           },
           "open": true
         },
+        "Field": {
+          "double[]##v_/SmartDashboard/Field/XModules": {
+            "open": true
+          },
+          "open": true
+        },
+        "Gyro": {
+          "open": true
+        },
         "open": true,
         "swerve": {
+          "double[]##v_/SmartDashboard/swerve/wheelLocations": {
+            "open": true
+          },
           "open": true
         }
       }
