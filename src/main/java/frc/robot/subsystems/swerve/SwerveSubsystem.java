@@ -1,11 +1,11 @@
 package frc.robot.subsystems.swerve;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
+import ca.team1310.swerve.core.SwerveMath;
 import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.telemetry.Telemetry;
 
@@ -113,10 +113,8 @@ public class SwerveSubsystem extends SubsystemBase {
         Telemetry.drive.fieldOrientedVelocityY = y;
         Telemetry.drive.fieldOrientedVelocityOmega = omega;
 
-        Rotation2d theta = Rotation2d.fromDegrees(drive.getYaw());
-
-        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, theta);
-        driveSafely(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+        var robotOriented = SwerveMath.toRobotOriented(x, y, Math.toRadians(drive.getYaw()));
+        driveSafely(robotOriented[0], robotOriented[1], omega);
     }
 
     /**
