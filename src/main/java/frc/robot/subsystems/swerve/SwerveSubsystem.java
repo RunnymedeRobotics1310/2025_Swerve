@@ -3,6 +3,7 @@ package frc.robot.subsystems.swerve;
 import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.core.SwerveMath;
 import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
+import ca.team1310.swerve.vision.VisionPoseCallback;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
@@ -18,8 +19,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SlewRateLimiter omegaLimiter;
     private final PIDController headingPIDController;
 
-    public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
-        this.drive = new FieldAwareSwerveDrive(config.coreConfig(), null);
+    public SwerveSubsystem(SwerveDriveSubsystemConfig config, VisionPoseCallback callback) {
+        this.drive = new FieldAwareSwerveDrive(config.coreConfig(), callback);
         this.config = config;
         this.xLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.yLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());

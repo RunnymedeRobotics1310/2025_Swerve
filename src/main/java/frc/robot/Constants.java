@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.subsystems.swerve.SwerveDriveSubsystemConfig;
 import frc.robot.subsystems.swerve.SwerveRotationConfig;
 import frc.robot.subsystems.swerve.SwerveTranslationConfig;
+import frc.robot.subsystems.vision.VisionConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -58,6 +59,17 @@ public final class Constants {
         public static final double FIELD_EXTENT_METRES_Y = 8.211;
         public static final double FIELD_EXTENT_METRES_X = 16.541;
     }
+
+    public static final VisionConfig VISION_CONFIG = new VisionConfig(
+            0,
+            0,
+            FieldConstants.FIELD_EXTENT_METRES_X,
+            FieldConstants.FIELD_EXTENT_METRES_Y,
+            0.7,
+            0.1,
+            .5,
+            "hugh"
+    );
 
     public static final class Swerve {
 
