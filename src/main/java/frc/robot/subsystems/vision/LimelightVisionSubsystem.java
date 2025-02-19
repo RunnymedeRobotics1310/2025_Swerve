@@ -170,9 +170,11 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         orientationSet[0] = yaw;
         lr_robotOrientation.set(orientationSet);
 
+        // System.out.println("Poser: yaw["+yaw+"], yawRate["+yawRate+"], llX["+currentPoseEstimate.getPose().getX()+"], llY["+currentPoseEstimate.getPose().getY()+"], llY["+currentPoseEstimate.getPose().getRotation().getDegrees()+"], ambg["+limelightBotPose.getTagAmbiguity(0)+"]");
+
         // If pose is 0,0 or no tags in view, we don't actually have data - return null
-        if (currentPoseEstimate.getPose().getX() == 0
-                && currentPoseEstimate.getPose().getY() == 0
+        if (currentPoseEstimate.getPose().getX() > 0
+                && currentPoseEstimate.getPose().getY() > 0
                 && limelightBotPose.getTagCount() > 0
                 && currentPoseEstimate.getPose().getX() < fieldExtentMetresX
                 && currentPoseEstimate.getPose().getY() < fieldExtentMetresY
