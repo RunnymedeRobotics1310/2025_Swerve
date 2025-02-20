@@ -1,38 +1,27 @@
 package frc.robot.subsystems.swerve;
 
-import static ca.team1310.swerve.utils.SwerveUtils.difference;
-import static ca.team1310.swerve.utils.SwerveUtils.normalizeRotation;
-
 import ca.team1310.swerve.RunnymedeSwerveDrive;
-import ca.team1310.swerve.SwerveTelemetry;
+import ca.team1310.swerve.core.SwerveMath;
 import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
-import ca.team1310.swerve.utils.SwerveUtils;
-import ca.team1310.swerve.vision.VisionAwareSwerveDrive;
+import ca.team1310.swerve.vision.VisionPoseCallback;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.telemetry.Telemetry;
 
 public class SwerveSubsystem extends SubsystemBase {
 
     private final RunnymedeSwerveDrive drive;
     private final SwerveDriveSubsystemConfig config;
-    private final SwerveTelemetry telemetry;
-    private final double maxTranslationSpeedMPS;
     private final SlewRateLimiter xLimiter;
     private final SlewRateLimiter yLimiter;
     private final SlewRateLimiter omegaLimiter;
     private final PIDController headingPIDController;
-    private final PIDController velocityPIDController;
 
-    public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
-        this.drive = new FieldAwareSwerveDrive(config.coreConfig());
-        //        this.drive                  = new VisionAwareSwerveDrive(config.coreConfig(), config.visionConfig());
+    public SwerveSubsystem(SwerveDriveSubsystemConfig config, VisionPoseCallback callback) {
+        this.drive = new FieldAwareSwerveDrive(config.coreConfig(), callback);
         this.config = config;
-        this.telemetry = config.coreConfig().telemetry();
-        this.maxTranslationSpeedMPS = config.coreConfig().maxAttainableTranslationSpeedMetresPerSecond();
         this.xLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.yLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
         this.omegaLimiter = new SlewRateLimiter(config.rotationConfig().maxAccelerationRadPS2());
@@ -41,15 +30,8 @@ public class SwerveSubsystem extends SubsystemBase {
             config.rotationConfig().headingI(),
             config.rotationConfig().headingD()
         );
-        velocityPIDController = new PIDController(
-            config.translationConfig().velocityP(),
-            config.translationConfig().velocityI(),
-            config.translationConfig().velocityD()
-        );
-    }
-
-    public void periodic() {
-        drive.periodic();
+        headingPIDController.enableContinuousInput(-180, 180);
+        headingPIDController.setTolerance(2);
     }
 
     /*
@@ -57,86 +39,83 @@ public class SwerveSubsystem extends SubsystemBase {
      * Core methods for controlling the drivebase
      */
 
-    private void driveSafely(ChassisSpeeds robotOrientedVelocity) {
-        double x = robotOrientedVelocity.vxMetersPerSecond;
-        double y = robotOrientedVelocity.vyMetersPerSecond;
-        double w = robotOrientedVelocity.omegaRadiansPerSecond;
-
-        // Limit change in values. Note this may not scale
-        // evenly - one may reach desired speed before another.
-
-        // Use driveFieldOriented to avoid this.
-
+    /**
+     * Add limiters to the change in drive values. Note this may not scale
+     * evenly - one may reach desired speed before another.
+     * @param x m/s
+     * @param y m/s
+     * @param omega rad/s
+     */
+    private void driveSafely(double x, double y, double omega) {
         x = xLimiter.calculate(x);
         y = yLimiter.calculate(y);
-        w = omegaLimiter.calculate(w);
-
-        ChassisSpeeds safeVelocity = new ChassisSpeeds(x, y, w);
+        omega = omegaLimiter.calculate(omega);
 
         if (this.config.enabled()) {
-            this.drive.drive(safeVelocity);
+            this.drive.drive(x, y, omega);
         }
     }
 
     /**
-     * The primary method for controlling the drivebase. The provided {@link ChassisSpeeds}
-     * specifies the robot-relative chassis speeds of the robot.
+     * The primary method for controlling the drivebase. The provided parameters
+     * specify the robot-relative chassis speeds of the robot.
      * <p>
      * This method is responsible for applying safety code to prevent the robot from attempting to
      * exceed its physical limits both in terms of speed and acceleration.
-     *
-     * @param velocity The intended velocity of the robot chassis relative to itself.
-     * @see ChassisSpeeds for how to construct a ChassisSpeeds object including
-     * {@link ChassisSpeeds#fromFieldRelativeSpeeds(double, double, double, Rotation2d)}
+     * <p>
+     * @param x m/s
+     * @param y m/s
+     * @param omega rad/s
      */
-    public final void driveRobotOriented(ChassisSpeeds velocity) {
-        this.telemetry.fieldOrientedVelocityX = 0;
-        this.telemetry.fieldOrientedVelocityY = 0;
-        this.telemetry.fieldOrientedVelocityOmega = 0;
-        this.telemetry.fieldOrientedDeltaToPoseX = 0;
-        this.telemetry.fieldOrientedDeltaToPoseY = 0;
-        this.telemetry.fieldOrientedDeltaToPoseHeading = 0;
+    public final void driveRobotOriented(double x, double y, double omega) {
+        Telemetry.drive.fieldOrientedVelocityX = 0;
+        Telemetry.drive.fieldOrientedVelocityY = 0;
+        Telemetry.drive.fieldOrientedVelocityOmega = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseX = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseY = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseHeading = 0;
 
-        driveSafely(velocity);
+        driveSafely(x, y, omega);
     }
 
     /**
      * Stop all motors as fast as possible
      */
     public void stop() {
-        driveRobotOriented(new ChassisSpeeds(0, 0, 0));
+        driveRobotOriented(0, 0, 0);
     }
 
     /**
      * Convenience method for controlling the robot in field-oriented drive mode. Transforms the
-     * field-oriented inputs into the required robot-oriented {@link ChassisSpeeds} object that can
+     * field-oriented inputs into the required robot-oriented inputs that can
      * be used by the robot.
      *
-     * @param velocity the linear velocity of the robot in metres per second. Positive x is away
-     * from the alliance wall, and positive y is toward the left wall when looking through the
-     * driver station glass.
-     * @param omega the rotation rate of the heading of the robot. CCW positive.
+     * @param x the linear velocity of the robot in metres per second. Positive x is away from the blue alliance wall
+     * @param y the linear velocity of the robot in metres per second. Positive y is to the left of the robot
+     * @param omega the rotation rate of the heading of the robot in radians per second. CCW positive.
      */
-    public final void driveFieldOriented(Translation2d velocity, Rotation2d omega) {
-        this.telemetry.fieldOrientedDeltaToPoseX = 0;
-        this.telemetry.fieldOrientedDeltaToPoseY = 0;
-        this.telemetry.fieldOrientedDeltaToPoseHeading = 0;
+    public final void driveFieldOriented(double x, double y, double omega) {
+        Telemetry.drive.fieldOrientedDeltaToPoseX = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseY = 0;
+        Telemetry.drive.fieldOrientedDeltaToPoseHeading = 0;
 
-        driveFieldOrientedInternal(velocity, omega);
+        driveFieldOrientedInternal(x, y, omega);
     }
 
-    private void driveFieldOrientedInternal(Translation2d velocity, Rotation2d omega) {
-        this.telemetry.fieldOrientedVelocityX = velocity.getX();
-        this.telemetry.fieldOrientedVelocityY = velocity.getY();
-        this.telemetry.fieldOrientedVelocityOmega = omega.getRadians();
+    /*
+     * INTERNAL method for driving field-oriented. This should be called by another method that updates
+     * telemetry values  fieldOrientedDeltaToPoseX, fieldOrientedDeltaToPoseY, fieldOrientedDeltaToPoseHeading.
+     * @param x
+     * @param y
+     * @param omega
+     */
+    private void driveFieldOrientedInternal(double x, double y, double omega) {
+        Telemetry.drive.fieldOrientedVelocityX = x;
+        Telemetry.drive.fieldOrientedVelocityY = y;
+        Telemetry.drive.fieldOrientedVelocityOmega = omega;
 
-        double x = velocity.getX();
-        double y = velocity.getY();
-        double w = omega.getRadians();
-        Rotation2d theta = drive.getPose().getRotation();
-
-        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, w, theta);
-        driveSafely(chassisSpeeds);
+        var robotOriented = SwerveMath.toRobotOriented(x, y, Math.toRadians(drive.getYaw()));
+        driveSafely(robotOriented[0], robotOriented[1], omega);
     }
 
     /**
@@ -156,7 +135,15 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The robot's pose
      */
     public Pose2d getPose() {
-        return drive.getPose();
+        return drive.getPose(); // todo: fixme:
+    }
+
+    public double getYaw() {
+        return drive.getYaw();
+    }
+
+    public double getYawRate() {
+        return drive.getYawRate();
     }
 
     /**
@@ -185,10 +172,11 @@ public class SwerveSubsystem extends SubsystemBase {
      * This SHOULD NOT be called during normal operation - it is designed for TEST MODE ONLY!
      *
      * @param moduleName the module to activate
-     * @param desiredState the state of the specified module.
+     * @param speed in m/s
+     * @param angle in degrees
      */
-    public void setModuleState(String moduleName, SwerveModuleState desiredState) {
-        drive.setModuleState(moduleName, desiredState);
+    public void setModuleState(String moduleName, double speed, double angle) {
+        drive.setModuleState(moduleName, speed, angle);
     }
 
     @Override
@@ -206,148 +194,14 @@ public class SwerveSubsystem extends SubsystemBase {
      */
 
     /**
-     * Determine if the robot is close enough to the desired heading to stop rotating.
+     * Compute the required rotation speed of the robot given the desired heading.
+     * Note the desired heading is specified in degrees, adn the returned value
+     * is in radians per second.
+     * @param desiredHeadingDegrees the desired heading of the robot
+     * @return the required rotation speed of the robot (omega) in rad/s
      */
-    public boolean isCloseEnough(Rotation2d desiredHeading) {
-        return SwerveUtils.isCloseEnough(
-            drive.getPose().getRotation().getRadians(),
-            desiredHeading.getRadians(),
-            config.rotationConfig().toleranceRadians()
-        );
-    }
-
-    /**
-     * Determine if the robot is close enough to the desired location to stop moving.
-     */
-    public boolean isCloseEnough(Translation2d desiredLocation) {
-        return SwerveUtils.isCloseEnough(drive.getPose().getTranslation(), desiredLocation, config.translationConfig().toleranceMetres());
-    }
-
-    /**
-     * Determine if the robot is close enough to the desired pose to stop moving.
-     */
-    public boolean isCloseEnough(Pose2d desiredPose) {
-        return isCloseEnough(desiredPose.getTranslation()) && isCloseEnough(desiredPose.getRotation());
-    }
-
-    /**
-     * Compute the distance to the specified field position in metres.
-     */
-    public double getDistanceToFieldPositionMetres(Translation2d target) {
-        return drive.getPose().getTranslation().getDistance(target);
-    }
-
-    /**
-     * Compute the heading required to face the specified position on the field.
-     *
-     * @param target field position
-     * @return the heading toward that position.
-     */
-    public Rotation2d getHeadingToFieldPosition(Translation2d target) {
-        Translation2d currentRobotLocation = drive.getPose().getTranslation();
-        Translation2d delta = target.minus(currentRobotLocation);
-        return delta.getAngle();
-    }
-
-    /**
-     * Drive as fast as safely possible to the specified pose, up ot the max speed specified.
-     *
-     * @param desiredPose the desired location on the field
-     */
-    public final void driveToFieldPose(Pose2d desiredPose, double maxSpeedMPS) {
-        Pose2d current = getPose();
-        Transform2d delta = difference(desiredPose, current);
-
-        Translation2d velocity = computeVelocity(delta.getTranslation(), maxSpeedMPS);
-        Rotation2d omega = computeOmega(desiredPose.getRotation());
-
-        this.telemetry.fieldOrientedDeltaToPoseX = delta.getX();
-        this.telemetry.fieldOrientedDeltaToPoseY = delta.getY();
-        this.telemetry.fieldOrientedDeltaToPoseHeading = delta.getRotation().getDegrees();
-
-        driveFieldOrientedInternal(velocity, omega);
-    }
-
-    /**
-     * Return a velocity that will traverse the specified translation as fast as possible without
-     * overshooting the location. The initial speed is expected to be 0 and the final speed is
-     * expected to be 0.
-     *
-     * @param translationToTravel the desired translation to travel
-     * @param maxSpeed the maximum speed to travel in Metres per Second
-     * @return the velocity vector, in metres per second that the robot can safely travel
-     * to traverse the distance specified
-     */
-    private Translation2d computeVelocity(Translation2d translationToTravel, double maxSpeed) {
-        // todo: replace with PID
-        double distanceMetres = translationToTravel.getNorm();
-
-        // don't worry about tiny translations
-        if (distanceMetres < config.translationConfig().toleranceMetres()) {
-            return new Translation2d();
-        }
-
-        // safety code
-        if (maxSpeed > maxTranslationSpeedMPS) {
-            maxSpeed = maxTranslationSpeedMPS;
-        }
-
-        // ensure that we have enough room to decelerate
-        double decelDistance = Math.pow(maxTranslationSpeedMPS, 2) / (2 * config.translationConfig().maxAccelMPS2());
-        double decelDistRatio = distanceMetres / decelDistance;
-        if (decelDistRatio < 1) {
-            maxSpeed *= decelDistRatio;
-        }
-
-        double speed;
-        if (distanceMetres >= decelDistance) {
-            // cruising
-            speed = maxSpeed;
-        } else {
-            // decelerating
-            double pctToGo = distanceMetres / decelDistance;
-            speed = maxSpeed * pctToGo * velocityPIDController.getP();
-        }
-
-        // Confirm speed is not too slow to move
-        if (speed < config.translationConfig().minSpeedMPS()) {
-            speed = config.translationConfig().minSpeedMPS();
-        }
-
-        Rotation2d angle = translationToTravel.getAngle();
-
-        double xSign = Math.signum(translationToTravel.getX());
-        double ySign = Math.signum(translationToTravel.getY());
-        return new Translation2d(xSign * speed * Math.abs(angle.getCos()), ySign * speed * Math.abs(angle.getSin()));
-    }
-
-    /**
-     * Utility function to compute the required rotation speed of the robot given the heading
-     * provided.
-     *
-     * @param desiredHeading the desired heading of the robot
-     * @return The required rotation speed of the robot
-     */
-    public Rotation2d computeOmega(Rotation2d desiredHeading) {
-        // todo: replace with PID
-        Pose2d currentPose = drive.getPose();
-        double targetRad = normalizeRotation(desiredHeading.getRadians());
-        double currentRad = normalizeRotation(currentPose.getRotation().getRadians());
-
-        double errorRad = targetRad - currentRad;
-        errorRad = normalizeRotation(errorRad);
-        double absErrRad = Math.abs(errorRad);
-        double errSignum = Math.signum(errorRad);
-
-        final double omegaRad;
-        if (absErrRad < config.rotationConfig().toleranceRadians()) {
-            omegaRad = 0;
-        } else if (absErrRad < config.rotationConfig().slowZoneRadians()) {
-            omegaRad = errSignum * config.rotationConfig().minRotVelocityRadPS();
-        } else {
-            omegaRad = errSignum * config.rotationConfig().maxJumpSpeedRadPS();
-        }
-
-        return Rotation2d.fromRadians(omegaRad);
+    public double computeOmega(double desiredHeadingDegrees) {
+        return headingPIDController.calculate(drive.getYaw(), desiredHeadingDegrees);
+        //        return (desiredHeadingDegrees - drive.getYaw()) * config.rotationConfig().headingP();
     }
 }

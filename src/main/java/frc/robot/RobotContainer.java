@@ -9,6 +9,7 @@ import frc.robot.Constants.OiConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.LimelightVisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -21,6 +22,7 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
  */
 public class RobotContainer {
 
+    private final LimelightVisionSubsystem visionSubsystem = new LimelightVisionSubsystem(Constants.VISION_CONFIG);
     private final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem(Constants.Swerve.SUBSYSTEM_CONFIG);
     private final OperatorInput operatorInput = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT,
