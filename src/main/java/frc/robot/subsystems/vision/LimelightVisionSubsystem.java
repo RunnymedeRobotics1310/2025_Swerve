@@ -84,9 +84,13 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
     private Matrix<N3, N1> poseDeviationMegaTag2 = VecBuilder.fill(0.06, 0.06, 9999999);
 
     private final LimelightBotPose limelightBotPose = new LimelightBotPose(null, 0);
-    LimelightPoseEstimate currentPoseEstimate = new LimelightPoseEstimate(limelightBotPose.getPose(), limelightBotPose.getTimestampSeconds(), poseDeviationMegaTag1);
+    LimelightPoseEstimate currentPoseEstimate = new LimelightPoseEstimate(
+        limelightBotPose.getPose(),
+        limelightBotPose.getTimestampSeconds(),
+        poseDeviationMegaTag1
+    );
 
-    private double[] orientationSet = new double[] {0, 0, 0, 0, 0, 0};
+    private double[] orientationSet = new double[] { 0, 0, 0, 0, 0, 0 };
 
     private final double fieldExtentMetresX;
     private final double fieldExtentMetresY;
@@ -173,13 +177,14 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         // System.out.println("Poser: yaw["+yaw+"], yawRate["+yawRate+"], llX["+currentPoseEstimate.getPose().getX()+"], llY["+currentPoseEstimate.getPose().getY()+"], llY["+currentPoseEstimate.getPose().getRotation().getDegrees()+"], ambg["+limelightBotPose.getTagAmbiguity(0)+"]");
 
         // If pose is 0,0 or no tags in view, we don't actually have data - return null
-        if (currentPoseEstimate.getPose().getX() > 0
-                && currentPoseEstimate.getPose().getY() > 0
-                && limelightBotPose.getTagCount() > 0
-                && currentPoseEstimate.getPose().getX() < fieldExtentMetresX
-                && currentPoseEstimate.getPose().getY() < fieldExtentMetresY
-                && yawRate <= 720) {
-
+        if (
+            currentPoseEstimate.getPose().getX() > 0 &&
+            currentPoseEstimate.getPose().getY() > 0 &&
+            limelightBotPose.getTagCount() > 0 &&
+            currentPoseEstimate.getPose().getX() < fieldExtentMetresX &&
+            currentPoseEstimate.getPose().getY() < fieldExtentMetresY &&
+            yawRate <= 720
+        ) {
             // Get the "best" tag - assuming the first one is the best - TBD TODO
             double tagAmbiguity = limelightBotPose.getTagAmbiguity(0);
             if (tagAmbiguity < maxAmbiguity) {
@@ -213,5 +218,4 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
     public String toString() {
         return "Hugh Vision Subsystem";
     }
-
 }

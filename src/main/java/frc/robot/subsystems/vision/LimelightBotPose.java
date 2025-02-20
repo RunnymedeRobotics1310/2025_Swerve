@@ -1,11 +1,6 @@
 package frc.robot.subsystems.vision;
 
-import ca.team1310.swerve.vision.PoseEstimate;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-
 import java.util.Objects;
 
 public class LimelightBotPose {
@@ -37,11 +32,11 @@ public class LimelightBotPose {
     private static final int OFFSET_TAG_DIST_TO_ROBOT = 5;
     private static final int OFFSET_TAG_AMBIGUITY = 6;
 
-    public LimelightBotPose(double [] botPose, long timestamp) {
+    public LimelightBotPose(double[] botPose, long timestamp) {
         update(botPose, timestamp);
     }
 
-    public void update(double [] botPose, long timestamp) {
+    public void update(double[] botPose, long timestamp) {
         this.botPose = Objects.requireNonNullElseGet(botPose, () -> new double[0]);
         this.timestamp = timestamp;
     }
@@ -156,7 +151,7 @@ public class LimelightBotPose {
     }
 
     private double getTagElement(int index, int offset) {
-        int indexCalc = OFFSET_TAG_BASE + (index*ELEMENTS_PER_TAG) + offset;
+        int indexCalc = OFFSET_TAG_BASE + (index * ELEMENTS_PER_TAG) + offset;
         if (index < 0 || index >= getTagCount() || indexCalc >= botPose.length) {
             return Double.MIN_VALUE;
         }

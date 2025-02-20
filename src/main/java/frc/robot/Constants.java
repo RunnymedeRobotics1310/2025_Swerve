@@ -61,14 +61,14 @@ public final class Constants {
     }
 
     public static final VisionConfig VISION_CONFIG = new VisionConfig(
-            0,
-            0,
-            FieldConstants.FIELD_EXTENT_METRES_X,
-            FieldConstants.FIELD_EXTENT_METRES_Y,
-            0.7,
-            0.1,
-            .5,
-            "hugh"
+        0,
+        0,
+        FieldConstants.FIELD_EXTENT_METRES_X,
+        FieldConstants.FIELD_EXTENT_METRES_Y,
+        0.7,
+        0.1,
+        .5,
+        "hugh"
     );
 
     public static final class Swerve {
