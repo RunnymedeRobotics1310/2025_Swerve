@@ -9,5 +9,6 @@
       "cmd": "npx prettier --write ${file}",
       "event": "onFileChange"
     }
-  ]
+  ],
+  "workbench.tree.indent": 14
 }
