@@ -5,6 +5,8 @@
 package frc.robot;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
+import static frc.robot.Constants.FieldConstants.FIELD_EXTENT_METRES_X;
+import static frc.robot.Constants.FieldConstants.FIELD_EXTENT_METRES_Y;
 
 import ca.team1310.swerve.core.config.*;
 import ca.team1310.swerve.utils.Coordinates;
@@ -76,7 +78,7 @@ public final class Constants {
         /**
          * Front to back from the middle of the wheels
          */
-        public static final double WHEEL_BASE_METRES = inchesToMeters(21);
+        public static final double WHEEL_BASE_METRES = inchesToMeters(22.75);
         /**
          * Side to side from the middle of the wheels
          */
@@ -225,6 +227,69 @@ public final class Constants {
             WAIT_2_5_SECONDS,
             WAIT_3_SECONDS,
             WAIT_5_SECONDS
+        }
+
+        public enum FieldLocation {
+            // Pickup Locations
+            redRightOuterStation(new Pose2d(FIELD_EXTENT_METRES_X - 100, FIELD_EXTENT_METRES_Y - 70, Rotation2d.fromDegrees(234))),
+            blueRightOuterStation(new Pose2d(100, 70, Rotation2d.fromDegrees(234))),
+
+            // Reef Score Locations (Lettered as seen in manual - counter-clockwise starting from close-left)
+            redA(
+                new Pose2d(
+                    FieldConstants.FIELD_EXTENT_METRES_X - 3.20,
+                    FieldConstants.FIELD_EXTENT_METRES_Y - 4.10,
+                    Rotation2d.fromDegrees(0)
+                )
+            ),
+            blueA(new Pose2d(3.20, 4.10, Rotation2d.fromDegrees(0))),
+            redB(
+                new Pose2d(
+                    FieldConstants.FIELD_EXTENT_METRES_X - 3.20,
+                    FieldConstants.FIELD_EXTENT_METRES_Y - 3.80,
+                    Rotation2d.fromDegrees(0)
+                )
+            ),
+            blueB(new Pose2d(3.20, 3.80, Rotation2d.fromDegrees(0))),
+            redC(
+                new Pose2d(
+                    FieldConstants.FIELD_EXTENT_METRES_X - 4.00,
+                    FieldConstants.FIELD_EXTENT_METRES_Y - 3.10,
+                    Rotation2d.fromDegrees(60)
+                )
+            ),
+            blueC(new Pose2d(4.00, 3.10, Rotation2d.fromDegrees(60))),
+            redD(
+                new Pose2d(
+                    FieldConstants.FIELD_EXTENT_METRES_X - 4.20,
+                    FieldConstants.FIELD_EXTENT_METRES_Y - 2.80,
+                    Rotation2d.fromDegrees(60)
+                )
+            ),
+            blueD(new Pose2d(4.20, 2.80, Rotation2d.fromDegrees(60))),
+            redE(
+                new Pose2d(
+                    FieldConstants.FIELD_EXTENT_METRES_X - 5.10,
+                    FieldConstants.FIELD_EXTENT_METRES_Y - 2.70,
+                    Rotation2d.fromDegrees(120)
+                )
+            ),
+            blueE(new Pose2d(5.10, 2.70, Rotation2d.fromDegrees(120))),
+
+            // Auto transit poses
+            redRightExitTransit(new Pose2d(FIELD_EXTENT_METRES_X - 4.40, FIELD_EXTENT_METRES_Y - 0.90, Rotation2d.fromDegrees(180))),
+            blueRightExitTransit(new Pose2d(4.40, 0.90, Rotation2d.fromDegrees(180))),
+            redLeftExitTransit(new Pose2d(FIELD_EXTENT_METRES_X - 5.00, FIELD_EXTENT_METRES_Y - 6.00, Rotation2d.fromDegrees(0))),
+            blueLeftExitTransit(new Pose2d(5.00, 6.00, Rotation2d.fromDegrees(0))),
+
+            redRightPickupTransit(new Pose2d(FIELD_EXTENT_METRES_X - 2.80, FIELD_EXTENT_METRES_Y - 1.70, Rotation2d.fromDegrees(-135))),
+            blueRightPickupTransit(new Pose2d(2.80, 1.70, Rotation2d.fromDegrees(-135)));
+
+            public final Pose2d pose;
+
+            FieldLocation(Pose2d pose) {
+                this.pose = pose;
+            }
         }
     }
 

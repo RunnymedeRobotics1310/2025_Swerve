@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -11,6 +12,6 @@ public class ExitZoneAutoCommand extends SequentialCommandGroup {
 
     public ExitZoneAutoCommand(SwerveSubsystem swerve, double delay) {
         addCommands(new WaitCommand(delay));
-        addCommands(new DriveRobotOrientedCommand(swerve, new Translation2d(0, 1), new Rotation2d()));
+        //        addCommands(new DriveRobotOrientedCommand(swerve, new Pose2d(0, 1), new Rotation2d()));
     }
 }

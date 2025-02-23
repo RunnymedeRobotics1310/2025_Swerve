@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.telemetry.Telemetry;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -202,6 +203,18 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public double computeOmega(double desiredHeadingDegrees) {
         return headingPIDController.calculate(drive.getYaw(), desiredHeadingDegrees);
-        //        return (desiredHeadingDegrees - drive.getYaw()) * config.rotationConfig().headingP();
+    }
+
+    public double computeTranslateVelocity(double distance) {
+        double maxSpeedMPS = Constants.Swerve.TRANSLATION_CONFIG.maxSpeedMPS();
+        double speed = 0;
+
+        if (Math.abs(distance) >= 2) {
+            speed = maxSpeedMPS * Math.signum(distance);
+        } else {
+            speed = distance * /*maxSpeedMPS*/2 * Math.signum(distance);
+        }
+
+        return speed;
     }
 }

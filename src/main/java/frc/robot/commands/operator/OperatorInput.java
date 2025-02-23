@@ -19,9 +19,8 @@ import frc.robot.Constants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.auto.ExitZoneAutoCommand;
 import frc.robot.commands.auto.OptimisticAutoCommand;
-import frc.robot.commands.swervedrive.DriveDistanceCommand;
-import frc.robot.commands.swervedrive.DriveToPositionCommand;
 import frc.robot.commands.swervedrive.ResetOdometryCommand;
+import frc.robot.commands.swervedrive.SetPoseCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.commands.test.SystemTestCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -94,6 +93,10 @@ public class OperatorInput {
         return driverController.getPOV();
     }
 
+    public boolean isY() {
+        return driverController.getYButton();
+    }
+
     public double getDriverControllerAxis(Stick stick, Axis axis) {
         switch (stick) {
             case LEFT:
@@ -138,12 +141,8 @@ public class OperatorInput {
         new Trigger(driverController::getXButton).whileTrue(
             new ResetOdometryCommand(driveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0)))
         );
-        // drive to position test
-        //        Translation2d location = new Translation2d(2, 2);
-        //        Rotation2d heading = Rotation2d.fromDegrees(-20);
-        //        Pose2d desiredPose = new Pose2d(location, heading);
-        //        DriveToPositionCommand dtpc = new DriveToPositionCommand(driveSubsystem, BLUE_2_2_20, RED_2_2_20);
-        //        new Trigger(driverController::getBButton).onTrue(dtpc);
+
+        new Trigger(() -> isY()).onTrue(new SetPoseCommand(swerve, new Pose2d(7.6, 6.00, Rotation2d.fromDegrees(0))));
     }
 
     public Command getAutonomousCommand() {
