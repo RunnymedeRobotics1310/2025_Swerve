@@ -76,7 +76,7 @@ public final class Constants {
         /**
          * Front to back from the middle of the wheels
          */
-        public static final double WHEEL_BASE_METRES = inchesToMeters(21);
+        public static final double WHEEL_BASE_METRES = inchesToMeters(22.75);
         /**
          * Side to side from the middle of the wheels
          */
