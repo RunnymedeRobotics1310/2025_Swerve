@@ -31,7 +31,7 @@ exec {
     println "Checking for RunnymedeSwerve sources. Will build them if found. Expected directory '"+swerveLibDir.getPath()+"'."
     if (swerveLibDir.exists()) {
         workingDir swerveLibDir.getPath()
-        commandLine './gradlew', 'clean', 'build','publishToMavenLocal','--console=plain'
+        commandLine 'gradlew.bat', 'clean', 'build','publishToMavenLocal','--console=plain'
         ignoreExitValue false
         println "RunnymedeSwerve built successfully and deployed to maven local. If the library version number matches the version in this project's build.gradle, the newly built library will be used."
      } else {

@@ -201,7 +201,12 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return the required rotation speed of the robot (omega) in rad/s
      */
     public double computeOmega(double desiredHeadingDegrees) {
-        return headingPIDController.calculate(drive.getYaw(), desiredHeadingDegrees);
-        //        return (desiredHeadingDegrees - drive.getYaw()) * config.rotationConfig().headingP();
+        String fmt = "ComputeOmega desired: %.1f, yaw: %.1f, omega: %.1f.";
+
+        double yaw = drive.getYaw();
+
+        double w = headingPIDController.calculate(yaw, desiredHeadingDegrees);
+        //System.out.println(String.format(fmt, desiredHeadingDegrees, yaw, w));
+        return w;
     }
 }

@@ -122,7 +122,9 @@ public class OperatorInput {
         new Trigger(() -> (isZeroGyro())).onTrue(new ZeroGyroCommand(driveSubsystem));
         new Trigger(this::isCancel).whileTrue(new CancelCommand(driveSubsystem));
         new Trigger(driverController::getXButton).whileTrue(
-            new ResetOdometryCommand(driveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0)))
+//            new ResetOdometryCommand(driveSubsystem, new Pose2d(1.83, 0.40, Rotation2d.fromDegrees(0)))
+            // taped square in front of driver station
+            new ResetOdometryCommand(driveSubsystem, new Pose2d(1.65, 5.64, Rotation2d.fromDegrees(0)))
         );
         // drive to position test
         //        Translation2d location = new Translation2d(2, 2);
