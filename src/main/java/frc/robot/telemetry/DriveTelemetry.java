@@ -44,12 +44,12 @@ public class DriveTelemetry {
     double fieldSpeed = Math.hypot(fieldOrientedVelocityX, fieldOrientedVelocityY);
     String vField =
         String.format(
-            "%.1f (%.1f, %.1f) m/s %.1f deg/s",
+            "%.2f (%.2f, %.2f) m/s %.1f deg/s",
             fieldSpeed,
             fieldOrientedVelocityX,
             fieldOrientedVelocityY,
             Math.toDegrees(fieldOrientedVelocityOmega));
-    SmartDashboard.putString(PREFIX + "Drive/desired_velocity_field", vField);
+    SmartDashboard.putString(PREFIX + "Swerve/velocity_desired_field", vField);
 
     double dist = Math.hypot(fieldOrientedDeltaToPoseX, fieldOrientedDeltaToPoseY);
     String delta =
