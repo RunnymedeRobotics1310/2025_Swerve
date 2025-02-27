@@ -82,7 +82,7 @@ public final class Constants {
             /* tolerance (m) */ 0.02,
             /* min speed (m/s) */ 1.0,
             /* max speed (m/s) */ 4.8,
-            /* max module speed (m/s) */ 5.3,
+            /* max module speed (m/s) */ 5.36,
             /* max acceleration (m/s/s) */ 42.0,
             /* velocity PID p */ 1.2,
             /* velocity PID i */ 0,
