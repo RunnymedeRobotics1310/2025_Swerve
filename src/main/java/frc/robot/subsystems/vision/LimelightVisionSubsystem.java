@@ -190,7 +190,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
     // Get the current pose delta
     double compareDistance = -1;
     double compareHeading = -1;
-    double tagAmbiguity = -1;
+    double tagAmbiguity = botPoseMegaTag1.getTagAmbiguity(0);
+
     LimelightPoseEstimate.PoseConfidence poseConfidence = LimelightPoseEstimate.PoseConfidence.NONE;
     LimelightBotPose botPose = botPoseMegaTag1; // default to MT1 for telemetry
 
@@ -200,31 +201,26 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
             && botPoseMegaTag1.isPoseYInBounds(0, fieldExtentMetresY)
             && yawRate <= 720) {
 
-      // Get the "best" tag - assuming the first one is the best - TBD TODO
-      tagAmbiguity = botPoseMegaTag1.getTagAmbiguity(0);
-
       // Do we have a decent signal?  i.e. Ambiguity < 0.7
       if (tagAmbiguity < maxAmbiguity) {
         // Check for super good signal - ambiguity < 0.1, or we're disabled (field setup)
         if (tagAmbiguity < highQualityAmbiguity || DriverStation.isDisabled()) {
           // use megatag1 as is, it's rock solid
-          LimelightPoseEstimate poseEstimate =
+          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
+          returnVal =
                   new LimelightPoseEstimate(
                           botPoseMegaTag1.getPose(),
                           botPoseMegaTag1.getTimestampSeconds(),
                           POSE_DEVIATION_MEGATAG1);
-          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
-          returnVal = poseEstimate;
         } else {
           // Use MegaTag 2
-          LimelightPoseEstimate poseEstimate =
+          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
+          botPose = botPoseMegaTag2;
+          returnVal =
                   new LimelightPoseEstimate(
                           botPoseMegaTag2.getPose(),
                           botPoseMegaTag2.getTimestampSeconds(),
                           POSE_DEVIATION_MEGATAG2);
-          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
-          botPose = botPoseMegaTag2;
-          returnVal = poseEstimate;
         }
 
         if (Telemetry.vision.enabled) {
