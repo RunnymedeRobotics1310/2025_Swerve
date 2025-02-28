@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.telemetry.Telemetry;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -207,5 +208,18 @@ public class SwerveSubsystem extends SubsystemBase {
     double w = headingPIDController.calculate(yaw, desiredHeadingDegrees);
     // System.out.println(String.format(fmt, desiredHeadingDegrees, yaw, w));
     return w;
+  }
+
+  public double computeTranslateVelocity(double distance) {
+    double maxSpeedMPS = Constants.Swerve.TRANSLATION_CONFIG.maxSpeedMPS();
+    double speed;
+
+    if (Math.abs(distance) >= 2) {
+      speed = maxSpeedMPS * Math.signum(distance);
+    } else {
+      speed = distance * maxSpeedMPS / 2;
+    }
+
+    return speed;
   }
 }
