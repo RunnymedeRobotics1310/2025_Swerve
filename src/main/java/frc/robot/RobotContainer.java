@@ -13,38 +13,36 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.LimelightVisionSubsystem;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
 
-    private final LimelightVisionSubsystem visionSubsystem = new LimelightVisionSubsystem(Constants.VISION_CONFIG);
-    private final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem(Constants.Swerve.SUBSYSTEM_CONFIG, null);
-    private final OperatorInput operatorInput = new OperatorInput(
-        OiConstants.DRIVER_CONTROLLER_PORT,
-        OiConstants.OPERATOR_CONTROLLER_PORT,
-        swerveDriveSubsystem
-    );
+  private final LimelightVisionSubsystem visionSubsystem =
+      new LimelightVisionSubsystem(Constants.VISION_CONFIG);
+  private final SwerveSubsystem swerveDriveSubsystem =
+      new SwerveSubsystem(Constants.Swerve.SUBSYSTEM_CONFIG, null);
+  private final OperatorInput operatorInput =
+      new OperatorInput(
+          OiConstants.DRIVER_CONTROLLER_PORT,
+          OiConstants.OPERATOR_CONTROLLER_PORT,
+          swerveDriveSubsystem);
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        // Initialize all Subsystem default commands
-        swerveDriveSubsystem.setDefaultCommand(new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
-        // Configure the trigger bindings
-        operatorInput.configureBindings(swerveDriveSubsystem);
-    }
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    // Initialize all Subsystem default commands
+    swerveDriveSubsystem.setDefaultCommand(
+        new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
+    // Configure the trigger bindings
+    operatorInput.configureBindings(swerveDriveSubsystem);
+  }
 
-    //    public Command getAutonomousCommand() {
-    //        return operatorInput.getAutonomousCommand();
-    //    }
-    public Command getAutonomousCommand() {
-        return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
-    }
+  //    public Command getAutonomousCommand() {
+  //        return operatorInput.getAutonomousCommand();
+  //    }
+  public Command getAutonomousCommand() {
+    return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
+  }
 }
