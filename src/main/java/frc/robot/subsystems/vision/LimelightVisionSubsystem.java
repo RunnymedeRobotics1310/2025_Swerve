@@ -21,9 +21,7 @@ import frc.robot.telemetry.Telemetry;
 public class LimelightVisionSubsystem extends SubsystemBase implements VisionPoseCallback {
 
   private final NetworkTable nikolaVision =
-          NetworkTableInstance.getDefault().getTable("limelight-hugh");
-  private final NetworkTable thomasVision =
-          NetworkTableInstance.getDefault().getTable("limelight-thomas");
+          NetworkTableInstance.getDefault().getTable("limelight-nikola");
 
   // inputs/configs
   private final NetworkTableEntry nikolaCamMode = nikolaVision.getEntry("camMode");
