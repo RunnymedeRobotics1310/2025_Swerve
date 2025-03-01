@@ -215,9 +215,9 @@ public class SwerveSubsystem extends SubsystemBase {
     public double computeTranslateVelocity(double distance, double tolerance) {
         final double decelZoneMetres = 1.5;
         final double verySlowZone = 0.10;
-        final double verySlowSpeed = 0.08;
+        final double verySlowSpeed = 0.15;
         double maxSpeedMPS = Constants.Swerve.TRANSLATION_CONFIG.maxSpeedMPS();
-        maxSpeedMPS = 1;
+        maxSpeedMPS = 2;
         double speed;
 
         final double absDist = Math.abs(distance);
