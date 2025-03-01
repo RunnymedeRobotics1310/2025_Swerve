@@ -27,13 +27,18 @@ pluginManagement {
 }
 
 exec {
-    File swerveLibDir = new File("../RunnymedeSwerve")
+    File swerveLibDir = new File("../../RunnymedeSwerve")
     println "Checking for RunnymedeSwerve sources. Will build them if found. Expected directory '" + swerveLibDir.getPath() + "'."
     if (swerveLibDir.exists()) {
         workingDir swerveLibDir.getPath()
-  //      commandLine './gradlew', 'clean', 'build', 'publishToMavenLocal', '--console=plain'
-        commandLine 'gradlew.bat', 'clean', 'build','publishToMavenLocal','--console=plain'
+
+        // Determine the correct Gradle wrapper command based on OS
+        def isWindows = System.getProperty("os.name").toLowerCase().contains("win")
+        def gradleCmd = isWindows ? "gradlew.bat" : "./gradlew"
+
+        commandLine gradleCmd, 'clean', 'build', 'publishToMavenLocal', '--console=plain'
         ignoreExitValue false
+
         println "RunnymedeSwerve built successfully and deployed to maven local. If the library version number matches the version in this project's build.gradle, the newly built library will be used."
     } else {
         commandLine "echo", "RunnymedeSwerve sources not found. Not building them. The library must be already built and accessible (either locally or to a public repository)."
