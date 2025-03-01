@@ -215,9 +215,12 @@ public class SwerveSubsystem extends SubsystemBase {
     double speed;
 
     if (Math.abs(distance) >= 2) {
-      speed = maxSpeedMPS * Math.signum(distance);
+      speed = /*maxSpeedMPS*/2 * Math.signum(distance);
     } else {
-      speed = distance * maxSpeedMPS / 2;
+      speed = distance * /*maxSpeedMPS*/2 / 2;
+    }
+    if (Math.abs(speed) <= 0.05) {
+      speed = 0.05 * Math.signum(distance);
     }
 
     return speed;

@@ -228,6 +228,7 @@ public final class Constants {
               Rotation2d.fromDegrees(234))),
       blueRightOuterStation(new Pose2d(100, 70, Rotation2d.fromDegrees(234))),
 
+      blueLeftOuterStation(new Pose2d(1.30, FIELD_EXTENT_METRES_Y - 1, Rotation2d.fromDegrees(-234))),
       // Reef Score Locations (Lettered as seen in manual - counter-clockwise starting from
       // close-left)
       redA(
@@ -260,6 +261,9 @@ public final class Constants {
               FieldConstants.FIELD_EXTENT_METRES_Y - 2.70,
               Rotation2d.fromDegrees(120))),
       blueE(new Pose2d(5.10, 2.70, Rotation2d.fromDegrees(120))),
+      blueJ(new Pose2d(5.10, FIELD_EXTENT_METRES_Y - 2.70, Rotation2d.fromDegrees(-120))),
+      blueK(new Pose2d(4.20, FIELD_EXTENT_METRES_Y - 2.80, Rotation2d.fromDegrees(-60))),
+      blueL(new Pose2d(4.00, FIELD_EXTENT_METRES_Y - 3.10, Rotation2d.fromDegrees(-60))),
 
       // Auto transit poses
       redRightExitTransit(
@@ -273,14 +277,15 @@ public final class Constants {
               FIELD_EXTENT_METRES_X - 5.00,
               FIELD_EXTENT_METRES_Y - 6.00,
               Rotation2d.fromDegrees(0))),
-      blueLeftExitTransit(new Pose2d(5.00, 6.00, Rotation2d.fromDegrees(0))),
+      blueLeftExitTransit(new Pose2d(4.40, 6.50, Rotation2d.fromDegrees(0))),
 
       redRightPickupTransit(
           new Pose2d(
               FIELD_EXTENT_METRES_X - 2.80,
               FIELD_EXTENT_METRES_Y - 1.70,
               Rotation2d.fromDegrees(-135))),
-      blueRightPickupTransit(new Pose2d(2.80, 1.70, Rotation2d.fromDegrees(-135)));
+      blueRightPickupTransit(new Pose2d(2.80, 1.70, Rotation2d.fromDegrees(-135))),
+      blueLeftPickupTransit(new Pose2d(2.80, FIELD_EXTENT_METRES_Y - 1.70, Rotation2d.fromDegrees(135)));
 
       public final Pose2d pose;
 

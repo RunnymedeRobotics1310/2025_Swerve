@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.auto.DriveToLeftCenterPointAutoCommand;
+import frc.robot.commands.auto.OptimisticAutoCommand;
+import frc.robot.commands.auto.Score3L4AutoCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -24,7 +26,7 @@ public class RobotContainer {
   private final LimelightVisionSubsystem visionSubsystem =
       new LimelightVisionSubsystem(Constants.VISION_CONFIG);
   private final SwerveSubsystem swerveDriveSubsystem =
-      new SwerveSubsystem(Constants.Swerve.SUBSYSTEM_CONFIG, visionSubsystem);
+      new SwerveSubsystem(Constants.Swerve.SUBSYSTEM_CONFIG, null);
   private final OperatorInput operatorInput =
       new OperatorInput(OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
@@ -38,6 +40,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
+    return new Score3L4AutoCommand(swerveDriveSubsystem, 0);
+//    return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
   }
 }
