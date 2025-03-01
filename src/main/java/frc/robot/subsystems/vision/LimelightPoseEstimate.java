@@ -8,6 +8,12 @@ import edu.wpi.first.math.numbers.N3;
 
 public class LimelightPoseEstimate implements PoseEstimate {
 
+  public enum PoseConfidence {
+    NONE,
+    MEGATAG1,
+    MEGATAG2
+  }
+
   private Pose2d pose;
   private double timestamp;
   private Matrix<N3, N1> standardDeviations;
