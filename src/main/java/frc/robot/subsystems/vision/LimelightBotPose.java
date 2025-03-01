@@ -1,6 +1,8 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import java.util.Objects;
 
 public class LimelightBotPose {
@@ -53,8 +55,18 @@ public class LimelightBotPose {
     return getElement(OFFSET_POSE_X);
   }
 
+  public boolean isPoseXInBounds(double min, double max) {
+    double poseX = getElement(OFFSET_POSE_X);
+    return poseX >= min && poseX <= max;
+  }
+
   public double getPoseY() {
     return getElement(OFFSET_POSE_Y);
+  }
+
+  public boolean isPoseYInBounds(double min, double max) {
+    double poseY = getElement(OFFSET_POSE_Y);
+    return poseY >= min && poseY <= max;
   }
 
   public double getPoseZ() {
@@ -137,7 +149,7 @@ public class LimelightBotPose {
   }
 
   public double getTimestampSeconds() {
-    return timestamp;
+    return timestamp / 1000.0; // Convert from millis to seconds
   }
 
   private double getElement(int index) {

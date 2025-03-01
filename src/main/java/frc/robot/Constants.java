@@ -67,7 +67,7 @@ public final class Constants {
           0.7,
           0.1,
           .5,
-          "hugh");
+          true);
 
   public static final class Swerve {
 
