@@ -46,7 +46,7 @@ public class DriveToFieldLocationCommand extends LoggingCommand {
         double yDif = location.pose.getY() - currentPose.getY();
 
         double angleDif = SwerveUtils.normalizeDegrees(targetHeadingDeg - currentPose.getRotation().getDegrees());
-        log("Xdif: " + xDif + " Ydif: " + yDif + " ºdif: " + angleDif);
+//        log("Xdif: " + xDif + " Ydif: " + yDif + " ºdif: " + angleDif);
 
         swerve.driveFieldOriented(
                 swerve.computeTranslateVelocity(xDif, 0.02),

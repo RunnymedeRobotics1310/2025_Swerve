@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.swervedrive.DriveThroughFieldLocationCommand;
 import frc.robot.commands.swervedrive.DriveToFieldLocationCommand;
+import frc.robot.commands.swervedrive.NullDriveCommand;
 import frc.robot.commands.swervedrive.SetPoseCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 
@@ -13,7 +14,7 @@ import static frc.robot.Constants.AutoConstants.FieldLocation.*;
 
 public class Score3L4AutoCommand extends SequentialCommandGroup {
 
-    double speed = 1;
+    double speed = 3;
 
     public Score3L4AutoCommand(SwerveSubsystem swerve, double delay) {
         super();
@@ -25,17 +26,20 @@ public class Score3L4AutoCommand extends SequentialCommandGroup {
 
         addCommands(new DriveToFieldLocationCommand(swerve, blueJ));
         // Score l4 at left4
+        addCommands(new WaitCommand(2).deadlineFor(new NullDriveCommand(swerve)));
 //        addCommands(new DriveThroughFieldLocationCommand(swerve, blueLeftExitTransit, speed));
         addCommands(new DriveToFieldLocationCommand(swerve, blueLeftOuterStation));
         // Intake coral
 //        addCommands(new DriveThroughFieldLocationCommand(swerve, blueLeftPickupTransit, speed));
         addCommands(new DriveToFieldLocationCommand(swerve, blueA));
         // Score left1
+        addCommands(new WaitCommand(2).deadlineFor(new NullDriveCommand(swerve)));
         addCommands(new DriveThroughFieldLocationCommand(swerve, blueLeftPickupTransit, speed));
         addCommands(new DriveToFieldLocationCommand(swerve, blueLeftOuterStation));
         // Intake coral
         addCommands(new DriveToFieldLocationCommand(swerve, blueL));
         // Score coral
+        addCommands(new WaitCommand(2).deadlineFor(new NullDriveCommand(swerve)));
         addCommands(new DriveToFieldLocationCommand(swerve, blueLeftOuterStation));
         // Intake coral
 
