@@ -32,8 +32,11 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
     // output
     private final DoubleArraySubscriber nikolaMegaTag1 =
             nikolaVision.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[0]);
-    private final DoubleArraySubscriber nikolaMegaTag2 =
-            nikolaVision.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[0]);
+    private final DoubleArraySubscriber nikolaStddevs =
+            nikolaVision.getDoubleArrayTopic("stddevs").subscribe(new double[0]);
+
+//    private final DoubleArraySubscriber nikolaMegaTag2 =
+//            nikolaVision.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[0]);
 
     public enum CamStreamType {
         SIDE_BY_SIDE(0),
@@ -94,6 +97,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
 //  private final LimelightBotPose botPoseMegaTag2 = new LimelightBotPose(null, 0);
 
     private double[] orientationSet = new double[] {0, 0, 0, 0, 0, 0};
+    private double[] stddevs = new double[] {0.1, 0.1, 0, 0, 0, 0.5};
 
     private final double fieldExtentMetresX;
     private final double fieldExtentMetresY;
@@ -118,8 +122,9 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
 
     @Override
     public void periodic() {
-        TimestampedDoubleArray botPoseBlueMegaTag1 = nikolaMegaTag1.getAtomic();
-        botPoseMegaTag1.update(botPoseBlueMegaTag1.value, botPoseBlueMegaTag1.timestamp);
+//        TimestampedDoubleArray botPoseBlueMegaTag1 = nikolaMegaTag1.getAtomic();
+//        botPoseMegaTag1.update(botPoseBlueMegaTag1.value, botPoseBlueMegaTag1.timestamp);
+//        stddevs = nikolaStddevs.get();
 
 //    TimestampedDoubleArray botPoseBlueMegaTag2 = nikolaMegaTag2.getAtomic();
 //    botPoseMegaTag2.update(botPoseBlueMegaTag2.value, botPoseBlueMegaTag2.timestamp);
@@ -181,6 +186,10 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
      * @return the pose estimate
      */
     public PoseEstimate getPoseEstimate(Pose2d odometryPose, double yaw, double yawRate) {
+        TimestampedDoubleArray botPoseBlueMegaTag1 = nikolaMegaTag1.getAtomic();
+        botPoseMegaTag1.update(botPoseBlueMegaTag1.value, botPoseBlueMegaTag1.timestamp);
+        stddevs = nikolaStddevs.get();
+
         // First, update the limelight and let it know our orientation
         orientationSet[0] = yaw;
         nikolaRobotOrientation.set(orientationSet);
@@ -198,29 +207,21 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         // If pose is 0,0 or no tags in view, we don't actually have data - return null
         if (botPoseMegaTag1.getTagCount() > 0
                 && botPoseMegaTag1.isPoseXInBounds(0, fieldExtentMetresX)
-                && botPoseMegaTag1.isPoseYInBounds(0, fieldExtentMetresY)
-                && yawRate <= 720) {
+                && botPoseMegaTag1.isPoseYInBounds(0, fieldExtentMetresY)) {
 
             // Do we have a decent signal?  i.e. Ambiguity < 0.7
             if (tagAmbiguity < maxAmbiguity) {
                 // Check for super good signal - ambiguity < 0.1, or we're disabled (field setup)
                 if (tagAmbiguity < highQualityAmbiguity || DriverStation.isDisabled()) {
                     // use megatag1 as is, it's rock solid
+                    double[] deviations = new double[] {stddevs[0], stddevs[1], stddevs[5]};
                     poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
+
                     returnVal =
                             new LimelightPoseEstimate(
                                     botPoseMegaTag1.getPose(),
                                     botPoseMegaTag1.getTimestampSeconds(),
-                                    POSE_DEVIATION_MEGATAG1);
-//        } else {
-//          // Use MegaTag 2
-//          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
-//          botPose = botPoseMegaTag2;
-//          returnVal =
-//                  new LimelightPoseEstimate(
-//                          botPoseMegaTag2.getPose(),
-//                          botPoseMegaTag2.getTimestampSeconds(),
-//                          POSE_DEVIATION_MEGATAG2);
+                                    deviations);
                 }
 
                 if (Telemetry.vision.enabled) {

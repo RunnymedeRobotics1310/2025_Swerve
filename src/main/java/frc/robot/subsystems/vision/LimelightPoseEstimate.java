@@ -16,9 +16,9 @@ public class LimelightPoseEstimate implements PoseEstimate {
 
   private Pose2d pose;
   private double timestamp;
-  private Matrix<N3, N1> standardDeviations;
+  private double[] standardDeviations;
 
-  public LimelightPoseEstimate(Pose2d pose, double timestamp, Matrix<N3, N1> standardDeviations) {
+  public LimelightPoseEstimate(Pose2d pose, double timestamp, double[] standardDeviations) {
     this.pose = pose;
     this.timestamp = timestamp;
     this.standardDeviations = standardDeviations;
@@ -35,7 +35,7 @@ public class LimelightPoseEstimate implements PoseEstimate {
   }
 
   @Override
-  public Matrix<N3, N1> getStandardDeviations() {
+  public double[] getStandardDeviations() {
     return standardDeviations;
   }
 
@@ -47,7 +47,7 @@ public class LimelightPoseEstimate implements PoseEstimate {
     this.timestamp = timestamp;
   }
 
-  public void setStandardDeviations(Matrix<N3, N1> standardDeviations) {
+  public void setStandardDeviations(double[] standardDeviations) {
     this.standardDeviations = standardDeviations;
   }
 }
