@@ -91,7 +91,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
           VecBuilder.fill(0.06, 0.06, 9999999);
 
   private final LimelightBotPose botPoseMegaTag1 = new LimelightBotPose(null, 0);
-  private final LimelightBotPose botPoseMegaTag2 = new LimelightBotPose(null, 0);
+//  private final LimelightBotPose botPoseMegaTag2 = new LimelightBotPose(null, 0);
 
   private double[] orientationSet = new double[] {0, 0, 0, 0, 0, 0};
 
@@ -121,8 +121,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
     TimestampedDoubleArray botPoseBlueMegaTag1 = nikolaMegaTag1.getAtomic();
     botPoseMegaTag1.update(botPoseBlueMegaTag1.value, botPoseBlueMegaTag1.timestamp);
 
-    TimestampedDoubleArray botPoseBlueMegaTag2 = nikolaMegaTag2.getAtomic();
-    botPoseMegaTag2.update(botPoseBlueMegaTag2.value, botPoseBlueMegaTag2.timestamp);
+//    TimestampedDoubleArray botPoseBlueMegaTag2 = nikolaMegaTag2.getAtomic();
+//    botPoseMegaTag2.update(botPoseBlueMegaTag2.value, botPoseBlueMegaTag2.timestamp);
   }
 
   /* Public API */
@@ -212,15 +212,15 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
                           botPoseMegaTag1.getPose(),
                           botPoseMegaTag1.getTimestampSeconds(),
                           POSE_DEVIATION_MEGATAG1);
-        } else {
-          // Use MegaTag 2
-          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
-          botPose = botPoseMegaTag2;
-          returnVal =
-                  new LimelightPoseEstimate(
-                          botPoseMegaTag2.getPose(),
-                          botPoseMegaTag2.getTimestampSeconds(),
-                          POSE_DEVIATION_MEGATAG2);
+//        } else {
+//          // Use MegaTag 2
+//          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
+//          botPose = botPoseMegaTag2;
+//          returnVal =
+//                  new LimelightPoseEstimate(
+//                          botPoseMegaTag2.getPose(),
+//                          botPoseMegaTag2.getTimestampSeconds(),
+//                          POSE_DEVIATION_MEGATAG2);
         }
 
         if (Telemetry.vision.enabled) {
