@@ -256,6 +256,12 @@ public final class Constants {
       preScoreBlueRight6( 
         new Pose2d(6.1660,3.8609,Rotation2d.fromDegrees(180))
       ),
+      preIntakeCentreLeftBlueStation(
+        new Pose2d(1.139,7.000,Rotation2d.fromDegrees(126))
+      ),
+      preIntakeCentreRightBlueStation(
+        new Pose2d(1.139,1.052,Rotation2d.fromDegrees(234))
+      ),
       // Pickup Locations
       redRightOuterStation(
           new Pose2d(
