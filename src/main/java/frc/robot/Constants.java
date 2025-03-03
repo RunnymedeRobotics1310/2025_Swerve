@@ -270,7 +270,9 @@ public final class Constants {
               Rotation2d.fromDegrees(234))),
       blueRightOuterStation(new Pose2d(100, 70, Rotation2d.fromDegrees(234))),
 
-      blueLeftOuterStation(new Pose2d(1.30, FIELD_EXTENT_METRES_Y - 1, Rotation2d.fromDegrees(-234))),
+      blueLeftOuterStation(new Pose2d(1.15, 7.03, Rotation2d.fromDegrees(-234))),
+//      blueLeftOuterStation(new Pose2d(1.026, FIELD_EXTENT_METRES_Y - 1, Rotation2d.fromDegrees(-234))),
+
       // Reef Score Locations (Lettered as seen in manual - counter-clockwise starting from
       // close-left)
       redA(

@@ -19,7 +19,7 @@ public class Score3L4AutoCommand extends SequentialCommandGroup {
     public Score3L4AutoCommand(SwerveSubsystem swerve, double delay) {
         super();
 
-        addCommands(new SetPoseCommand(swerve, new Pose2d(7.6, 6.00, Rotation2d.fromDegrees(180))));
+        addCommands(new SetPoseCommand(swerve, new Pose2d(7.2, 5.63, Rotation2d.fromDegrees(0))));
 //        addCommands(new ZeroGyroCommand(swerve));
 
         addCommands(new WaitCommand(delay));
@@ -31,13 +31,13 @@ public class Score3L4AutoCommand extends SequentialCommandGroup {
         addCommands(new DriveToFieldLocationCommand(swerve, blueLeftOuterStation));
         // Intake coral
 //        addCommands(new DriveThroughFieldLocationCommand(swerve, blueLeftPickupTransit, speed));
-        addCommands(new DriveToFieldLocationCommand(swerve, preScoreBlueLeft1));
+        addCommands(new DriveToFieldLocationCommand(swerve, preScoreBlueLeft2));
         // Score left1
         addCommands(new WaitCommand(2).deadlineFor(new NullDriveCommand(swerve)));
-        addCommands(new DriveThroughFieldLocationCommand(swerve, blueLeftPickupTransit, speed));
+        //addCommands(new DriveThroughFieldLocationCommand(swerve, blueLeftPickupTransit, speed));
         addCommands(new DriveToFieldLocationCommand(swerve, blueLeftOuterStation));
         // Intake coral
-        addCommands(new DriveToFieldLocationCommand(swerve, preScoreBlueLeft2));
+        addCommands(new DriveToFieldLocationCommand(swerve, preScoreBlueLeft3));
         // Score coral
         addCommands(new WaitCommand(2).deadlineFor(new NullDriveCommand(swerve)));
         addCommands(new DriveToFieldLocationCommand(swerve, blueLeftOuterStation));

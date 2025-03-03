@@ -191,7 +191,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         stddevs = nikolaStddevs.get();
 
         // First, update the limelight and let it know our orientation
-        orientationSet[0] = yaw;
+        orientationSet[0] = odometryPose.getRotation().getDegrees();
         nikolaRobotOrientation.set(orientationSet);
 
         PoseEstimate returnVal = null;
@@ -200,7 +200,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         double compareDistance = -1;
         double compareHeading = -1;
         double tagAmbiguity = botPoseMegaTag1.getTagAmbiguity(0);
-        double[] deviations = new double[] {stddevs[0], stddevs[1], stddevs[5]};
+        double[] deviations = new double[] {-1,-1,-1};
 
         LimelightPoseEstimate.PoseConfidence poseConfidence = LimelightPoseEstimate.PoseConfidence.NONE;
         LimelightBotPose botPose = botPoseMegaTag1; // default to MT1 for telemetry
@@ -215,6 +215,9 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
                 // Check for super good signal - ambiguity < 0.1, or we're disabled (field setup)
                 if (tagAmbiguity < highQualityAmbiguity || DriverStation.isDisabled()) {
                     // use megatag1 as is, it's rock solid
+                    deviations[0] = stddevs[0]; // MegaTag1 X Standard Deviation
+                    deviations[1] = stddevs[1]; // MegaTag1 Y Standard Deviation
+                    deviations[2] = stddevs[5]; // MegaTag Deg Standard Deviation
                     poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
 
                     returnVal =
@@ -227,7 +230,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
                 if (Telemetry.vision.enabled) {
                     compareDistance =
                             botPose.getPose().getTranslation().getDistance(odometryPose.getTranslation());
-                    compareHeading = botPose.getPose().getRotation().getDegrees() - yaw;
+                    compareHeading = botPose.getPose().getRotation().getDegrees() - odometryPose.getRotation().getDegrees();
                 }
             }
         }

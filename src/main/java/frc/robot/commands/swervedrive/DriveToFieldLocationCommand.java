@@ -59,9 +59,20 @@ public class DriveToFieldLocationCommand extends LoggingCommand {
 //        return (SwerveUtils.isCloseEnough(
 //                swerve.getPose().getTranslation(), location.pose.getTranslation(), 0.05)
 //                && SwerveUtils.isCloseEnough(swerve.getPose().getRotation().getDegrees(), targetHeadingDeg, 10));
-        return (SwerveUtils.isCloseEnough(
+        boolean done = (SwerveUtils.isCloseEnough(
                 swerve.getPose().getTranslation(), location.pose.getTranslation(), 0.05)
                 && SwerveUtils.isCloseEnough(swerve.getYaw(), targetHeadingDeg, 10));
+    if (done) {
+      System.out.println(
+          "REACHED DESTINATION: x["
+              + swerve.getPose().getX()
+              + "] y["
+              + swerve.getPose().getY()
+              + "], deg["
+              + swerve.getPose().getRotation().getDegrees()
+              + "]");
+    }
+        return done;
     }
 
     @Override
