@@ -200,6 +200,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         double compareDistance = -1;
         double compareHeading = -1;
         double tagAmbiguity = botPoseMegaTag1.getTagAmbiguity(0);
+        double[] deviations = new double[] {stddevs[0], stddevs[1], stddevs[5]};
 
         LimelightPoseEstimate.PoseConfidence poseConfidence = LimelightPoseEstimate.PoseConfidence.NONE;
         LimelightBotPose botPose = botPoseMegaTag1; // default to MT1 for telemetry
@@ -214,7 +215,6 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
                 // Check for super good signal - ambiguity < 0.1, or we're disabled (field setup)
                 if (tagAmbiguity < highQualityAmbiguity || DriverStation.isDisabled()) {
                     // use megatag1 as is, it's rock solid
-                    double[] deviations = new double[] {stddevs[0], stddevs[1], stddevs[5]};
                     poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
 
                     returnVal =
@@ -244,6 +244,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
             Telemetry.vision.visionPoseX = botPose.getPoseX();
             Telemetry.vision.visionPoseY = botPose.getPoseY();
             Telemetry.vision.visionPoseHeading = botPose.getPoseRotationYaw();
+            Telemetry.vision.standardDeviations = deviations;
         }
 
         return returnVal;
