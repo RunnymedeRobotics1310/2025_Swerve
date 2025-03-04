@@ -1,7 +1,6 @@
 package frc.robot.commands.auto;
 
 import static frc.robot.Constants.AutoConstants.FieldLocation.*;
-import static frc.robot.Constants.FieldConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
