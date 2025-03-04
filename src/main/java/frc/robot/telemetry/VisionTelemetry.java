@@ -59,6 +59,11 @@ public class VisionTelemetry {
 
     public double[] standardDeviations = new double[] { -1, -1, -1 };
 
+    public double navxYaw;
+
+    public double navxYawDelta;
+
+
     void post() {
         // Do nothing if not enabled
         if (!enabled) {
@@ -84,5 +89,9 @@ public class VisionTelemetry {
         String stdDevs =
                 String.format("(%.2fx, %.2fy) %.1f°", standardDeviations[0], standardDeviations[1], standardDeviations[2]);
         SmartDashboard.putString(PREFIX + "Vision/std_devs", stdDevs);
+
+        SmartDashboard.putString(PREFIX + "Vision/yaw_navx", String.format("%.2f°", navxYaw));
+
+        SmartDashboard.putString(PREFIX + "Vision/yaw_navx_delta", String.format("%.2f°", navxYawDelta));
     }
 }
