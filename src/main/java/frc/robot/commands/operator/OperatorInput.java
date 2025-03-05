@@ -6,8 +6,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.swervedrive.ResetOdometryCommand;
+import frc.robot.commands.swervedrive.Score1CoralPoseCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.commands.test.SystemTestCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -123,5 +125,10 @@ public class OperatorInput {
     //        DriveToPositionCommand dtpc = new DriveToPositionCommand(driveSubsystem, BLUE_2_2_20,
     // RED_2_2_20);
     //        new Trigger(driverController::getBButton).onTrue(dtpc);
+
+    new Trigger(() -> driverController.getLeftTriggerAxis() > 0.5)
+        .onTrue(
+            new Score1CoralPoseCommand(
+                driveSubsystem, Constants.AutoConstants.FieldLocation.preScoreBlueLeft1));
   }
 }

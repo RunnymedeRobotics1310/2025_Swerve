@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class LimelightBotPose {
@@ -103,6 +104,19 @@ public class LimelightBotPose {
 
   public double getAvgTagArea() {
     return getElement(OFFSET_AVG_TAG_AREA);
+  }
+
+  /**
+   * Get the list of tags visible
+   *
+   * @return array list of tag ids visible
+   */
+  public double[] getVisibleTags() {
+    ArrayList<Double> tags = new ArrayList<>();
+    for (int i = 0; i < getTagCount(); i++) {
+      tags.add(getTagId(i));
+    }
+    return tags.stream().mapToDouble(d -> d).toArray();
   }
 
   /**
