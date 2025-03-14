@@ -21,47 +21,52 @@ public class OptimisticAutoCommand extends SequentialCommandGroup {
 
     addCommands(new WaitCommand(delay));
 
-    addCommands(new DriveToFieldLocationCommand(swerve, redE, blueE));
-    // Score L4 - 1 - E
-    addCommands(new DriveToFieldLocationCommand(swerve, redRightExitTransit, blueRightExitTransit));
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
-    // Intake Coral
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightPickupTransit, blueRightPickupTransit));
-    addCommands(new DriveToFieldLocationCommand(swerve, redB, blueB));
-
-    // Score L4 - 2 - B
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightPickupTransit, blueRightPickupTransit));
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
-    // Intake Coral
-    addCommands(new DriveToFieldLocationCommand(swerve, redC, blueC));
-
-    // Score L4 - 3 - C
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
-    // Intake Coral
-    addCommands(new DriveToFieldLocationCommand(swerve, redD, blueD));
-
-    // Score L4 - 4 - D
-
-    // ------------------ IF TIME ------------------ //
-
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
-    // Intake Coral
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightPickupTransit, blueRightPickupTransit));
-    addCommands(new DriveToFieldLocationCommand(swerve, redA, blueA));
-
-    // Score L4 - 5? - A
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightPickupTransit, blueRightPickupTransit));
-    addCommands(
-        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
-    // Intake Coral
+    //    addCommands(new DriveToFieldLocationCommand(swerve, redE, blueE));
+    //    // Score L4 - 1 - E
+    //    addCommands(new DriveToFieldLocationCommand(swerve, redRightExitTransit,
+    // blueRightExitTransit));
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
+    //    // Intake Coral
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightPickupTransit,
+    // blueRightPickupTransit));
+    //    addCommands(new DriveToFieldLocationCommand(swerve, redB, blueB));
+    //
+    //    // Score L4 - 2 - B
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightPickupTransit,
+    // blueRightPickupTransit));
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
+    //    // Intake Coral
+    //    addCommands(new DriveToFieldLocationCommand(swerve, redC, blueC));
+    //
+    //    // Score L4 - 3 - C
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
+    //    // Intake Coral
+    //    addCommands(new DriveToFieldLocationCommand(swerve, redD, blueD));
+    //
+    //    // Score L4 - 4 - D
+    //
+    //    // ------------------ IF TIME ------------------ //
+    //
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
+    //    // Intake Coral
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightPickupTransit,
+    // blueRightPickupTransit));
+    //    addCommands(new DriveToFieldLocationCommand(swerve, redA, blueA));
+    //
+    //    // Score L4 - 5? - A
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightPickupTransit,
+    // blueRightPickupTransit));
+    //    addCommands(
+    //        new DriveToFieldLocationCommand(swerve, redRightOuterStation, blueRightOuterStation));
+    //    // Intake Coral
 
   }
 }

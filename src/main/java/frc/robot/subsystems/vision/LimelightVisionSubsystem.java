@@ -104,6 +104,8 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
   private final double highQualityAmbiguity;
   private final double maxVisposDeltaDistanceMetres;
 
+  private boolean doVisionUpdates = true;
+
   private int targetTagId = 0;
 
   public LimelightVisionSubsystem(VisionConfig visionConfig) {
@@ -128,12 +130,20 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
 
   /* Public API */
 
+  public void setDoVisionUpdates(boolean doVisionUpdates) {
+    this.doVisionUpdates = doVisionUpdates;
+  }
+
   public int getNumTagsVisible() {
     return (int) botPoseMegaTag1.getTagCount();
   }
 
   public void setTargetTagId(TagType tag) {
     this.targetTagId = tag.getIndex();
+  }
+
+  public void setTargetTagId(int tag) {
+    this.targetTagId = tag;
   }
 
   public void clearTargetTagId() {
@@ -158,6 +168,30 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
       index = botPoseMegaTag1.getTagIndex(targetTagId);
     }
     return botPoseMegaTag1.getTagTxnc(index);
+  }
+
+  public boolean isTagInView(int tagId) {
+    return botPoseMegaTag1.getTagIndex(tagId) != -1;
+  }
+
+  public double distanceTagToRobot() {
+    LimelightBotPose botPose = botPoseMegaTag1;
+
+    int index = 0;
+    if (targetTagId > 0) {
+      index = botPose.getTagIndex(targetTagId);
+    }
+    return botPose.getTagDistToRobot(index);
+  }
+
+  public double distanceTagToCamera() {
+    LimelightBotPose botPose = botPoseMegaTag1;
+
+    int index = 0;
+    if (targetTagId > 0) {
+      index = botPose.getTagIndex(targetTagId);
+    }
+    return botPose.getTagDistToCamera(index);
   }
 
   public LimelightBotPose getBotPose() {
@@ -250,6 +284,12 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
       Telemetry.vision.poseXSeries.add(botPose.getPoseX());
       Telemetry.vision.poseYSeries.add(botPose.getPoseY());
       Telemetry.vision.poseDegSeries.add(botPose.getPoseRotationYaw());
+      Telemetry.vision.tx = botPose.getTagTxnc(0);
+      Telemetry.vision.distance = botPose.getTagDistToRobot(0);
+    }
+
+    if (!doVisionUpdates) {
+      returnVal = null;
     }
 
     return returnVal;

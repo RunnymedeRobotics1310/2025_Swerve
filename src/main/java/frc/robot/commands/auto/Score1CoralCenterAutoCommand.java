@@ -14,7 +14,7 @@ public class Score1CoralCenterAutoCommand extends SequentialCommandGroup {
 
     addCommands(
         new DriveToFieldLocationCommand(
-            swerve, Constants.AutoConstants.FieldLocation.preScoreBlueLeft6));
+            swerve, Constants.AutoConstants.FieldLocation.PRE_SCORE_LEFT_6));
     //        addCommands(new SetupScoreCommand(swerve, coral, l4));
     //        addCommands(new PlantCoralCommand(coral));
     //        addCommands(new SetCoralPoseCommand(coral, compact));

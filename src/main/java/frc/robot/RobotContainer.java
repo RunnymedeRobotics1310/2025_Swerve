@@ -36,11 +36,11 @@ public class RobotContainer {
     swerveDriveSubsystem.setDefaultCommand(
         new TeleopDriveCommand(swerveDriveSubsystem, operatorInput));
     // Configure the trigger bindings
-    operatorInput.configureBindings(swerveDriveSubsystem);
+    operatorInput.configureBindings(swerveDriveSubsystem, visionSubsystem);
   }
 
   public Command getAutonomousCommand() {
     return new Score3L4AutoCommand(swerveDriveSubsystem, 0);
-//    return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
+    //    return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
   }
 }

@@ -44,8 +44,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * Add limiters to the change in drive values. Note this may not scale evenly - one may reach
      * desired speed before another.
      *
-     * @param x     m/s
-     * @param y     m/s
+     * @param x m/s
+     * @param y m/s
      * @param omega rad/s
      */
     private void driveSafely(double x, double y, double omega) {
@@ -67,8 +67,8 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * <p>
      *
-     * @param x     m/s
-     * @param y     m/s
+     * @param x m/s
+     * @param y m/s
      * @param omega rad/s
      */
     public final void driveRobotOriented(double x, double y, double omega) {
@@ -82,9 +82,7 @@ public class SwerveSubsystem extends SubsystemBase {
         driveSafely(x, y, omega);
     }
 
-    /**
-     * Stop all motors as fast as possible
-     */
+    /** Stop all motors as fast as possible */
     public void stop() {
         driveRobotOriented(0, 0, 0);
     }
@@ -93,10 +91,10 @@ public class SwerveSubsystem extends SubsystemBase {
      * Convenience method for controlling the robot in field-oriented drive mode. Transforms the
      * field-oriented inputs into the required robot-oriented inputs that can be used by the robot.
      *
-     * @param x     the linear velocity of the robot in metres per second. Positive x is away from the
-     *              blue alliance wall
-     * @param y     the linear velocity of the robot in metres per second. Positive y is to the left of
-     *              the robot
+     * @param x the linear velocity of the robot in metres per second. Positive x is away from the
+     *     blue alliance wall
+     * @param y the linear velocity of the robot in metres per second. Positive y is to the left of
+     *     the robot
      * @param omega the rotation rate of the heading of the robot in radians per second. CCW positive.
      */
     public final void driveFieldOriented(double x, double y, double omega) {
@@ -108,10 +106,15 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /*
-     * INTERNAL method for driving field-oriented. This should be called by another method that updates
-     * telemetry values  fieldOrientedDeltaToPoseX, fieldOrientedDeltaToPoseY, fieldOrientedDeltaToPoseHeading.
+     * INTERNAL method for driving field-oriented. This should be called by another method that
+     * updates
+     * telemetry values fieldOrientedDeltaToPoseX, fieldOrientedDeltaToPoseY,
+     * fieldOrientedDeltaToPoseHeading.
+     *
      * @param x
+     *
      * @param y
+     *
      * @param omega
      */
     private void driveFieldOrientedInternal(double x, double y, double omega) {
@@ -151,6 +154,15 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Set the gyro yaw offset of the robot, in degrees.
+     *
+     * @param yaw the yaw offset of the robot, in degrees
+     */
+    public void setYaw(double yaw) {
+        drive.setYaw(yaw);
+    }
+
+    /**
      * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
      */
     public void zeroGyro() {
@@ -174,8 +186,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * <p>This SHOULD NOT be called during normal operation - it is designed for TEST MODE ONLY!
      *
      * @param moduleName the module to activate
-     * @param speed      in m/s
-     * @param angle      in degrees
+     * @param speed in m/s
+     * @param angle in degrees
      */
     public void setModuleState(String moduleName, double speed, double angle) {
         drive.setModuleState(moduleName, speed, angle);
@@ -203,18 +215,12 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return the required rotation speed of the robot (omega) in rad/s
      */
     public double computeOmega(double desiredHeadingDegrees) {
-        String fmt = "ComputeOmega desired: %.1f, yaw: %.1f, omega: %.1f.";
-
-        double yaw = drive.getYaw();
-
-        double w = headingPIDController.calculate(yaw, desiredHeadingDegrees);
-        // System.out.println(String.format(fmt, desiredHeadingDegrees, yaw, w));
-        return w;
+        return headingPIDController.calculate(drive.getYaw(), desiredHeadingDegrees);
     }
 
     public double computeTranslateVelocity(double distance, double tolerance) {
-        final double decelZoneMetres = 1.5;
-        final double verySlowZone = 0.10;
+        final double decelZoneMetres = 1.2;
+        final double verySlowZone = 0.2;
         final double verySlowSpeed = 0.15;
         double maxSpeedMPS = Constants.Swerve.TRANSLATION_CONFIG.maxSpeedMPS();
         maxSpeedMPS = 3;
@@ -242,4 +248,35 @@ public class SwerveSubsystem extends SubsystemBase {
 
         return speed;
     }
+
+    public double getClosestReefAngle(double currentX, double currentY) {
+        double reefX = 4.49;
+        double reefY = 4.03;
+        double reefDiff = 8.57;
+
+        double rrX = reefX - currentX;
+        double rrY = reefY - currentY;
+        if (rrX > Constants.FieldConstants.FIELD_EXTENT_METRES_X/2) {
+            rrX -= reefDiff;
+        }
+
+        double angleAroundReefDeg = Math.toDegrees(Math.atan2(rrX, rrY));
+
+        if (angleAroundReefDeg > -150 && angleAroundReefDeg < -90) {
+            return -60;
+        } else if (angleAroundReefDeg < -30 && angleAroundReefDeg > -90) {
+            return -120;
+        } else if (angleAroundReefDeg < 30 && angleAroundReefDeg > -30) {
+            return 180;
+        } else if (angleAroundReefDeg < 90 && angleAroundReefDeg > 30) {
+            return 120;
+        } else if (angleAroundReefDeg < 150 && angleAroundReefDeg > 90) {
+            return 60;
+        } else {
+            return 0;
+        }
+
+
+    }
+
 }

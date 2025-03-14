@@ -5,10 +5,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants;
 import frc.robot.commands.LoggingCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.LimelightVisionSubsystem;
 
 public class Score1CoralPoseCommand extends LoggingCommand {
 
   private final SwerveSubsystem swerve;
+  private final LimelightVisionSubsystem visionSubsystem;
   private final Constants.AutoConstants.FieldLocation location;
   private final double targetHeadingDeg;
   private boolean doneDriving = false;
@@ -16,8 +18,11 @@ public class Score1CoralPoseCommand extends LoggingCommand {
   private double vY = 0;
 
   public Score1CoralPoseCommand(
-      SwerveSubsystem swerve, Constants.AutoConstants.FieldLocation location) {
+      SwerveSubsystem swerve,
+      LimelightVisionSubsystem visionSubsystem,
+      Constants.AutoConstants.FieldLocation location) {
     this.swerve = swerve;
+    this.visionSubsystem = visionSubsystem;
     this.location = location;
     this.targetHeadingDeg = SwerveUtils.normalizeDegrees(location.pose.getRotation().getDegrees());
 
@@ -28,6 +33,7 @@ public class Score1CoralPoseCommand extends LoggingCommand {
   public void initialize() {
 
     logCommandStart();
+    visionSubsystem.setDoVisionUpdates(false);
 
     log("Pose: " + swerve.getPose());
   }
@@ -78,6 +84,7 @@ public class Score1CoralPoseCommand extends LoggingCommand {
 
   public void end(boolean interrupted) {
     logCommandEnd(interrupted);
+    visionSubsystem.setDoVisionUpdates(true);
     swerve.stop();
   }
 

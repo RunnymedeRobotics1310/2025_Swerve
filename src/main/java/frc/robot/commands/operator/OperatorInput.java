@@ -8,11 +8,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.commands.CancelCommand;
+import frc.robot.commands.swervedrive.DriveToScorePositionCommand;
 import frc.robot.commands.swervedrive.ResetOdometryCommand;
-import frc.robot.commands.swervedrive.Score1CoralPoseCommand;
 import frc.robot.commands.swervedrive.ZeroGyroCommand;
 import frc.robot.commands.test.SystemTestCommand;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.LimelightVisionSubsystem;
 
 /** The DriverController exposes all driver functions */
 public class OperatorInput {
@@ -105,7 +106,8 @@ public class OperatorInput {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-  public void configureBindings(SwerveSubsystem driveSubsystem) {
+  public void configureBindings(
+      SwerveSubsystem driveSubsystem, LimelightVisionSubsystem visionSubsystem) {
     // Enter Test Mode (Start and Back pressed at the same time)
     new Trigger(() -> (isToggleTestMode())).onTrue(new SystemTestCommand(this, driveSubsystem));
 
@@ -126,9 +128,19 @@ public class OperatorInput {
     // RED_2_2_20);
     //        new Trigger(driverController::getBButton).onTrue(dtpc);
 
+    //    new Trigger(() -> driverController.getLeftTriggerAxis() > 0.5)
+    //        .onTrue(
+    //            new Score1CoralPoseCommand(
+    //                driveSubsystem,
+    //                visionSubsystem,
+    //                Constants.AutoConstants.FieldLocation.preScoreBlueLeft1));
+
     new Trigger(() -> driverController.getLeftTriggerAxis() > 0.5)
         .onTrue(
-            new Score1CoralPoseCommand(
-                driveSubsystem, Constants.AutoConstants.FieldLocation.preScoreBlueLeft1));
+            new DriveToScorePositionCommand(
+                driveSubsystem,
+                visionSubsystem,
+                Constants.AutoConstants.FieldLocation.PRE_SCORE_LEFT_1,
+                true));
   }
 }

@@ -70,6 +70,9 @@ public class VisionTelemetry {
   public TimeSeriesMetric poseYSeries = new TimeSeriesMetric();
   public TimeSeriesMetric poseDegSeries = new TimeSeriesMetric();
 
+  public double tx = -1;
+  public double distance = -1;
+
   public void addPoseToSeries(Pose2d pose) {
     poseXSeries.add(pose.getTranslation().getX());
     poseYSeries.add(pose.getTranslation().getY());
@@ -112,13 +115,13 @@ public class VisionTelemetry {
 
     String poseVisSeries =
         String.format(
-            "([%.2f-%.2f], [%.2f-%.2f])m [[%.1f-%.1f]°",
-            poseXSeries.getMaxValue(),
-            poseXSeries.getMaxValue(),
-            poseYSeries.getMinValue(),
-            poseYSeries.getMaxValue(),
-            poseDegSeries.getMinValue(),
-            poseDegSeries.getMaxValue());
+            "(%.2f, %.2f)m %.1f°",
+            poseXSeries.getMaxValue() - poseXSeries.getMinValue(),
+            poseYSeries.getMaxValue() - poseYSeries.getMinValue(),
+            poseDegSeries.getMaxValue() - poseDegSeries.getMinValue());
     SmartDashboard.putString(PREFIX + "Vision/pose_vis_range", poseVisSeries);
+
+    SmartDashboard.putNumber(PREFIX + "Vision/tx", tx);
+    SmartDashboard.putNumber(PREFIX + "Vision/distance", distance);
   }
 }
