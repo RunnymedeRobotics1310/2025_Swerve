@@ -18,7 +18,7 @@ public class Score3L4AutoCommand extends SequentialCommandGroup {
   public Score3L4AutoCommand(SwerveSubsystem swerve, double delay) {
     super();
 
-    addCommands(new SetPoseCommand(swerve, new Pose2d(7.2, 5.63, Rotation2d.fromDegrees(0))));
+    addCommands(new SetPoseCommand(swerve, new Pose2d(7.2, 5.63, Rotation2d.fromDegrees(180))));
     //        addCommands(new ZeroGyroCommand(swerve));
 
     addCommands(new WaitCommand(delay));
