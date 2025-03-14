@@ -305,8 +305,15 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         && nikolaBotPose.isPoseXInBounds(0, fieldExtentMetresX)
         && nikolaBotPose.isPoseYInBounds(0, fieldExtentMetresY)) {
 
-      // Do we have a decent signal?  i.e. Ambiguity < 0.7
-      if (tagAmbiguity < maxAmbiguity) {
+      if (megatag2) {
+        returnVal =
+            new LimelightPoseEstimate(
+                nikolaBotPose.getPose(),
+                nikolaBotPose.getTimestampSeconds(),
+                POSE_DEVIATION_MEGATAG2.getData());
+      }
+      // MT1: Do we have a decent signal?  i.e. Ambiguity < 0.7
+      else if (tagAmbiguity < maxAmbiguity) {
         // Check for super good signal - ambiguity < 0.1, or we're disabled (field setup)
         if (tagAmbiguity < highQualityAmbiguity || DriverStation.isDisabled()) {
           // use megatag1 as is, it's rock solid
@@ -324,14 +331,13 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
               new LimelightPoseEstimate(
                   nikolaBotPose.getPose(), nikolaBotPose.getTimestampSeconds(), deviations);
         }
+      }
 
-        if (Telemetry.vision.enabled) {
-          compareDistance =
-              botPose.getPose().getTranslation().getDistance(odometryPose.getTranslation());
-          compareHeading =
-              botPose.getPose().getRotation().getDegrees()
-                  - odometryPose.getRotation().getDegrees();
-        }
+      if (Telemetry.vision.enabled) {
+        compareDistance =
+            botPose.getPose().getTranslation().getDistance(odometryPose.getTranslation());
+        compareHeading =
+            botPose.getPose().getRotation().getDegrees() - odometryPose.getRotation().getDegrees();
       }
     }
 
