@@ -306,11 +306,12 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         && nikolaBotPose.isPoseYInBounds(0, fieldExtentMetresY)) {
 
       if (megatag2) {
-        returnVal =
-            new LimelightPoseEstimate(
-                nikolaBotPose.getPose(),
-                nikolaBotPose.getTimestampSeconds(),
-                POSE_DEVIATION_MEGATAG2.getData());
+          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
+          returnVal =
+              new LimelightPoseEstimate(
+                  nikolaBotPose.getPose(),
+                  nikolaBotPose.getTimestampSeconds(),
+                  POSE_DEVIATION_MEGATAG2.getData());
       }
       // MT1: Do we have a decent signal?  i.e. Ambiguity < 0.7
       else if (tagAmbiguity < maxAmbiguity) {
@@ -321,11 +322,7 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
           deviations[0] = stddevs[0]; // MegaTag1 X Standard Deviation
           deviations[1] = stddevs[1]; // MegaTag1 Y Standard Deviation
           deviations[2] = stddevs[5]; // MegaTag Deg Standard Deviation
-          if (megatag2) {
-            poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
-          } else {
-            poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
-          }
+          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
 
           returnVal =
               new LimelightPoseEstimate(
