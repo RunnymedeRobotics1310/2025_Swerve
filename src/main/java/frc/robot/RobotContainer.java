@@ -5,10 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
-
 import frc.robot.Constants.OiConstants;
-import frc.robot.commands.auto.DriveToLeftCenterPointAutoCommand;
-import frc.robot.commands.auto.OptimisticAutoCommand;
 import frc.robot.commands.auto.Score3L4AutoCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
@@ -40,7 +37,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Score3L4AutoCommand(swerveDriveSubsystem, 0);
+    return new Score3L4AutoCommand(swerveDriveSubsystem, visionSubsystem, 0);
     //    return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
+    //    return new Score1CoralCenterAutoCommand(swerveDriveSubsystem, visionSubsystem, 0);
   }
 }

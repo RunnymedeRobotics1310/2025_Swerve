@@ -245,7 +245,12 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
   }
 
   public boolean isTagInView(int tagId) {
-    return nikolaBotPose.getTagIndex(tagId) != -1;
+    return isTagInView(tagId, true);
+  }
+
+  public boolean isTagInView(int tagId, boolean leftBranch) {
+    LimelightBotPose botPose = getBotPose(leftBranch);
+    return botPose.getTagIndex(tagId) != -1;
   }
 
   /**
@@ -306,12 +311,12 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
         && nikolaBotPose.isPoseYInBounds(0, fieldExtentMetresY)) {
 
       if (megatag2) {
-          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
-          returnVal =
-              new LimelightPoseEstimate(
-                  nikolaBotPose.getPose(),
-                  nikolaBotPose.getTimestampSeconds(),
-                  POSE_DEVIATION_MEGATAG2.getData());
+        poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
+        returnVal =
+            new LimelightPoseEstimate(
+                nikolaBotPose.getPose(),
+                nikolaBotPose.getTimestampSeconds() - nikolaBotPose.getTotalLatencySeconds(),
+                POSE_DEVIATION_MEGATAG2.getData());
       }
       // MT1: Do we have a decent signal?  i.e. Ambiguity < 0.7
       else if (tagAmbiguity < maxAmbiguity) {
