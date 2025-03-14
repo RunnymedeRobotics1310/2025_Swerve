@@ -106,7 +106,7 @@ public class DriveToTagCommand extends LoggingCommand {
    */
   private Pose2d initTag() {
     if (fieldLocation == null) {
-      int visionClosestTagId = (int) visionSubsystem.getVisibleTargetTagId();
+      int visionClosestTagId = (int) visionSubsystem.getVisibleTargetTagId(isLeftBranch);
       if (!Constants.FieldConstants.TAGS.isValidTagId(visionClosestTagId)) {
         return null;
       }
@@ -153,8 +153,8 @@ public class DriveToTagCommand extends LoggingCommand {
     if (tagInView) {
       // Get Target info from Limelight & Swerve
       double robotHeading = swerve.getYaw();
-      double targetAngleRelative = visionSubsystem.angleToTarget();
-      double distanceToTarget = visionSubsystem.distanceTagToRobot();
+      double targetAngleRelative = visionSubsystem.angleToTarget(isLeftBranch);
+      double distanceToTarget = visionSubsystem.distanceTagToRobot(isLeftBranch);
       lastUpdateTime = Timer.getFPGATimestamp();
 
       // Compute target position relative to robot
