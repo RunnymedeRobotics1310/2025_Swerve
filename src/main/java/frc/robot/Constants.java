@@ -258,6 +258,10 @@ public final class Constants {
     public static final SwerveDriveSubsystemConfig SUBSYSTEM_CONFIG =
         new SwerveDriveSubsystemConfig(
             true, CORE_SWERVE_CONFIG, TRANSLATION_CONFIG, ROTATION_CONFIG);
+
+    // Ultrasonic port
+    public static final int ULTRASONIC_SENSOR_PORT = 0;
+    public static final double SCORING_DISTANCE_TOLERANCE = 0.05;
   }
 
   public static final class AutoConstants {
