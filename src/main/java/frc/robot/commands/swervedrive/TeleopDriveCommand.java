@@ -1,14 +1,5 @@
 package frc.robot.commands.swervedrive;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.operator.OperatorInput;
-import frc.robot.subsystems.swerve.SwerveSubsystem;
-
 import static ca.team1310.swerve.utils.SwerveUtils.normalizeDegrees;
 import static frc.robot.Constants.OiConstants.*;
 import static frc.robot.Constants.Swerve.ROTATION_CONFIG;
@@ -19,19 +10,29 @@ import static frc.robot.commands.operator.OperatorInput.Axis.Y;
 import static frc.robot.commands.operator.OperatorInput.Stick.LEFT;
 import static frc.robot.commands.operator.OperatorInput.Stick.RIGHT;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
+import frc.robot.commands.operator.OperatorInput;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
+
 public class TeleopDriveCommand extends BaseDriveCommand {
 
     private final OperatorInput oi;
     private boolean invert;
     private Double headingSetpointDeg = null;
-    private final boolean fieldOriented = true;
-    private final Timer rotationSettleTimer = new Timer();
+    private boolean fieldOriented = true;
+    private Timer rotationSettleTimer = new Timer();
     private boolean prevRotate180Val = false;
 
-    /**
-     * Used to drive a swerve robot in full field-centric mode.
-     */
-    public TeleopDriveCommand(SwerveSubsystem swerve, OperatorInput operatorInput) {
+    /** Used to drive a swerve robot in full field-centric mode. */
+    public TeleopDriveCommand(
+            SwerveSubsystem swerve,
+            OperatorInput operatorInput) {
         super(swerve);
         this.oi = operatorInput;
     }
@@ -40,6 +41,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     public void initialize() {
         super.initialize();
         rotationSettleTimer.start();
+        rotationSettleTimer.reset();
         headingSetpointDeg = null;
 
         // The FRC field-oriented coordinate system
@@ -55,7 +57,8 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     }
 
     // Called every time the scheduler runs while the command is scheduled.
-    //    @Override
+    // @Override
+    @Override
     public void execute() {
         super.execute();
 
@@ -72,18 +75,30 @@ public class TeleopDriveCommand extends BaseDriveCommand {
         // Thus, negative x stick axis maps to positive y translation on the field.
         final double vY = -oi.getDriverControllerAxis(LEFT, X);
 
+        // Operator x for fine-tuning robot oriented
+        final double oX = 0;
+
+        // Operator y for fine-tuning robot oriented
+        final double oY = 0;
+
         // Left and right on the right stick will change the direction the robot is facing - its
         // heading. Positive x values on the stick translate to clockwise motion, and vice versa.
         // The coordinate system has positive motion as CCW.
         // Therefore, negative x stick value maps to positive rotation on the field.
-        final double ccwRotAngularVelPct = -oi.getDriverControllerAxis(RIGHT, X) * 0.65;
+        final double ccwRotAngularVelPct =
+                -oi.getDriverControllerAxis(RIGHT, X) * 0.65; // TODO: put this in constants?
 
         final boolean rotate180Val = oi.getRotate180Val();
 
+        final boolean faceReef = oi.isFaceReef();
+
+        final boolean faceLeftStation = oi.isAlignLeftStation();
+        final boolean faceRightStation = oi.isAlignRightStation();
+
         // Compute boost factor
-        //        final boolean isSlow = oi.isDriverLeftBumper();
-        final boolean isSlow = false;
-        final boolean isFast = oi.isDriverRightBumper();
+        final boolean isSlow = oi.isSlowMode();
+        //    final boolean isSlow = false;
+        final boolean isFast = oi.isFastMode();
         final double boostFactor =
                 isSlow ? SLOW_SPEED_FACTOR : (isFast ? MAX_SPEED_FACTOR : GENERAL_SPEED_FACTOR);
 
@@ -102,7 +117,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             omegaRadiansPerSecond =
                     Math.pow(correctedCcwRotAngularVelPct, 3) * ROTATION_CONFIG.maxRotVelocityRadPS();
             // Save previous heading for when we are finished steering and slow enough.
-            //            headingSetpoint = Rotation2d.fromDegrees(swerve.getYaw());
+            // headingSetpoint = Rotation2d.fromDegrees(swerve.getYaw());
             headingSetpointDeg = null;
             rotationSettleTimer.reset();
         } else {
@@ -124,6 +139,30 @@ public class TeleopDriveCommand extends BaseDriveCommand {
                 }
             }
 
+            if (faceReef) {
+                headingSetpointDeg =
+                        swerve.getClosestReefAngle(swerve.getPose().getX(), swerve.getPose().getY());
+            }
+
+            if (faceLeftStation) {
+                if (invert) {
+                    headingSetpointDeg =
+                            Constants.FieldConstants.TAGS.RED_LEFT_SOURCE.pose.getRotation().getDegrees();
+                } else {
+                    headingSetpointDeg =
+                            Constants.FieldConstants.TAGS.BLUE_LEFT_SOURCE.pose.getRotation().getDegrees();
+                }
+            }
+            if (faceRightStation) {
+                if (invert) {
+                    headingSetpointDeg =
+                            Constants.FieldConstants.TAGS.RED_RIGHT_SOURCE.pose.getRotation().getDegrees();
+                } else {
+                    headingSetpointDeg =
+                            Constants.FieldConstants.TAGS.BLUE_RIGHT_SOURCE.pose.getRotation().getDegrees();
+                }
+            }
+
             // Don't spin around on zero gyro!
             if (isZeroGyro) {
                 headingSetpointDeg = null;
@@ -138,12 +177,22 @@ public class TeleopDriveCommand extends BaseDriveCommand {
             }
         }
 
-        if (fieldOriented) {
-            // Field-oriented mode
-            swerve.driveFieldOriented(velocity.getX(), velocity.getY(), omegaRadiansPerSecond);
+        // if driver isn't driving, operator has control
+        if ((vX == 0 && vY == 0 && ccwRotAngularVelPct == 0) && (oX != 0 || oY != 0)) {
+            swerve.driveRobotOriented(
+                    oX * TRANSLATION_CONFIG.maxSpeedMPS(),
+                    oY * TRANSLATION_CONFIG.maxSpeedMPS(),
+                    omegaRadiansPerSecond);
+            rotationSettleTimer.reset();
+            // driver gets priority otherwise
         } else {
-            // Robot-oriented mode
-            swerve.driveRobotOriented(velocity.getX(), velocity.getY(), omegaRadiansPerSecond);
+            if (fieldOriented) {
+                // Field-oriented mode
+                swerve.driveFieldOriented(velocity.getX(), velocity.getY(), omegaRadiansPerSecond);
+            } else {
+                // Robot-oriented mode
+                swerve.driveRobotOriented(velocity.getX(), velocity.getY(), omegaRadiansPerSecond);
+            }
         }
     }
 
@@ -152,6 +201,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     public void end(boolean interrupted) {
         super.end(interrupted);
         headingSetpointDeg = null;
+        rotationSettleTimer.reset();
     }
 
     // Returns true when the command should end.
