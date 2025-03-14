@@ -33,7 +33,6 @@ public class Score1CoralPoseCommand extends LoggingCommand {
   public void initialize() {
 
     logCommandStart();
-    visionSubsystem.setDoVisionUpdates(false);
 
     log("Pose: " + swerve.getPose());
   }
@@ -84,7 +83,6 @@ public class Score1CoralPoseCommand extends LoggingCommand {
 
   public void end(boolean interrupted) {
     logCommandEnd(interrupted);
-    visionSubsystem.setDoVisionUpdates(true);
     swerve.stop();
   }
 

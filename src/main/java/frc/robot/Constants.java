@@ -127,6 +127,7 @@ public final class Constants {
           0.7,
           0.3,
           .5,
+          true,
           true);
 
   public static final class Swerve {
