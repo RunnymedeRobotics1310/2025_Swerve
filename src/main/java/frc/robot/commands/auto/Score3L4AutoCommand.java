@@ -13,7 +13,7 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 
 public class Score3L4AutoCommand extends SequentialCommandGroup {
 
-  double speed = 3;
+  double speed = 2;
 
   public Score3L4AutoCommand(SwerveSubsystem swerve, double delay) {
     super();
