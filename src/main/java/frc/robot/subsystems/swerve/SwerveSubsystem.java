@@ -1,14 +1,20 @@
 package frc.robot.subsystems.swerve;
 
+import static frc.robot.Constants.DriveConstants.ULTRASONIC_SENSOR_PORT;
+
 import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.core.SwerveMath;
 import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
+import ca.team1310.swerve.utils.SwerveUtils;
 import ca.team1310.swerve.vision.VisionPoseCallback;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RunnymedeUtils;
 import frc.robot.telemetry.Telemetry;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -19,6 +25,11 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SlewRateLimiter yLimiter;
     private final SlewRateLimiter omegaLimiter;
     private final PIDController headingPIDController;
+    private final AnalogInput ultrasonicDistanceSensor = new AnalogInput(ULTRASONIC_SENSOR_PORT);
+
+    private double ultrasonicVoltage;
+    private double ultrasonicDistanceM;
+
 
     public SwerveSubsystem(SwerveDriveSubsystemConfig config, VisionPoseCallback callback) {
         this.drive = new FieldAwareSwerveDrive(config.coreConfig(), callback);
@@ -33,6 +44,15 @@ public class SwerveSubsystem extends SubsystemBase {
                         config.rotationConfig().headingD());
         headingPIDController.enableContinuousInput(-180, 180);
         headingPIDController.setTolerance(2);
+    }
+
+
+    public void periodic() {
+        ultrasonicVoltage = ultrasonicDistanceSensor.getVoltage();
+        ultrasonicDistanceM = Math.round(1.28722 * ultrasonicVoltage - 0.53066);
+
+        Telemetry.drive.ultrasonicDistanceM = ultrasonicDistanceM;
+        Telemetry.drive.ultrasonicVoltage = ultrasonicVoltage;
     }
 
     /*
@@ -134,6 +154,10 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public boolean lock() {
         return drive.lock();
+    }
+
+    public double getUltrasonicDistanceM() {
+        return ultrasonicDistanceM;
     }
 
     /**
@@ -250,17 +274,19 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public double getClosestReefAngle(double currentX, double currentY) {
-        double reefX = 4.49;
+        double blueReefX = 4.49;
+        double redReefX = 13.06;
         double reefY = 4.03;
-        double reefDiff = 8.57;
 
-        double rrX = reefX - currentX;
-        double rrY = reefY - currentY;
-        if (rrX > Constants.FieldConstants.FIELD_EXTENT_METRES_X/2) {
-            rrX -= reefDiff;
+        double rrX;
+        if (RunnymedeUtils.getRunnymedeAlliance() == DriverStation.Alliance.Red) {
+            rrX = redReefX - currentX;
+        } else {
+            rrX = blueReefX - currentX;
         }
+        double rrY = reefY - currentY;
 
-        double angleAroundReefDeg = Math.toDegrees(Math.atan2(rrX, rrY));
+        double angleAroundReefDeg = SwerveUtils.normalizeDegrees(Math.toDegrees(Math.atan2(rrX, rrY)) + 90);
 
         if (angleAroundReefDeg > -150 && angleAroundReefDeg < -90) {
             return -60;
@@ -275,8 +301,6 @@ public class SwerveSubsystem extends SubsystemBase {
         } else {
             return 0;
         }
-
-
     }
 
 }

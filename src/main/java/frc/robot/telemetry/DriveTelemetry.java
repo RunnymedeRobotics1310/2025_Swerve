@@ -40,16 +40,19 @@ public class DriveTelemetry {
    */
   public double fieldOrientedDeltaToPoseHeading = Double.MIN_VALUE;
 
+  public double ultrasonicDistanceM = Double.MIN_VALUE;
+  public double ultrasonicVoltage = Double.MIN_VALUE;
+
   void post() {
     double fieldSpeed = Math.hypot(fieldOrientedVelocityX, fieldOrientedVelocityY);
     String vField =
         String.format(
-            "%.2f (%.2f, %.2f) m/s %.1f deg/s",
+            "%.1f (%.1f, %.1f) m/s %.1f deg/s",
             fieldSpeed,
             fieldOrientedVelocityX,
             fieldOrientedVelocityY,
             Math.toDegrees(fieldOrientedVelocityOmega));
-    SmartDashboard.putString(PREFIX + "Swerve/velocity_desired_field", vField);
+    SmartDashboard.putString(PREFIX + "Drive/desired_velocity_field", vField);
 
     double dist = Math.hypot(fieldOrientedDeltaToPoseX, fieldOrientedDeltaToPoseY);
     String delta =
@@ -60,5 +63,8 @@ public class DriveTelemetry {
             fieldOrientedDeltaToPoseY,
             fieldOrientedDeltaToPoseHeading);
     SmartDashboard.putString(PREFIX + "Drive/distance_to_pose", delta);
+
+    SmartDashboard.putNumber(PREFIX + "Drive/Ultrasonic Distance Cm", ultrasonicDistanceM);
+    SmartDashboard.putNumber(PREFIX + "Drive/Ultrasonic Voltage", ultrasonicVoltage);
   }
 }
