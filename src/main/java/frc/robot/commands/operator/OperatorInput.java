@@ -53,15 +53,27 @@ public class OperatorInput {
   }
 
   public boolean getRotate180Val() {
+    return driverController.getAButton();
+  }
+
+  public boolean isFaceReef() {
+    return driverController.getBButton();
+  }
+
+  public boolean isAlignLeftStation() {
+    return driverController.getLeftTriggerAxis() > 0.5;
+  }
+
+  public boolean isAlignRightStation() {
+    return driverController.getRightTriggerAxis() > 0.5;
+  }
+
+  public boolean isSlowMode() {
     return driverController.getLeftBumperButton();
   }
 
-  public boolean isDriverRightBumper() {
+  public boolean isFastMode() {
     return driverController.getRightBumperButton();
-  }
-
-  public boolean isFaceSpeaker() {
-    return driverController.getYButton();
   }
 
   public boolean isZeroGyro() {
