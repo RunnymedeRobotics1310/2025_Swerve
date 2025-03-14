@@ -237,7 +237,20 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return the required rotation speed of the robot (omega) in rad/s
    */
   public double computeOmega(double desiredHeadingDegrees) {
-    return headingPIDController.calculate(drive.getYaw(), desiredHeadingDegrees);
+    return computeOmega(desiredHeadingDegrees, config.rotationConfig().defaultRotVelocityRadPS());
+  }
+
+  /**
+   * Compute the required rotation speed of the robot given the desired heading. Note the desired
+   * heading is specified in degrees, adn the returned value is in radians per second.
+   *
+   * @param desiredHeadingDegrees the desired heading of the robot
+   * @param maxOmegaRadPerSec the maximum allowable rotation speed of the robot
+   * @return the required rotation speed of the robot (omega) in rad/s
+   */
+  public double computeOmega(double desiredHeadingDegrees, double maxOmegaRadPerSec) {
+    double omega = headingPIDController.calculate(drive.getYaw(), desiredHeadingDegrees);
+    return Math.min(omega, maxOmegaRadPerSec);
   }
 
   public double computeTranslateVelocity(double distance, double tolerance) {
