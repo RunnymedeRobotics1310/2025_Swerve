@@ -85,9 +85,6 @@ public class DriveToTagCommand extends LoggingCommand {
       return;
     }
 
-    // Whatever tag we're looking at, it's the one we want.
-    visionSubsystem.setTargetTagId(tagId);
-
     // Calculate the target position based on tag with side and backwards offsets
     calcTargetPosition(tagPose.getRotation().getDegrees());
 
@@ -153,8 +150,8 @@ public class DriveToTagCommand extends LoggingCommand {
     if (tagInView) {
       // Get Target info from Limelight & Swerve
       double robotHeading = swerve.getYaw();
-      double targetAngleRelative = visionSubsystem.angleToTarget(isLeftBranch);
-      double distanceToTarget = visionSubsystem.distanceTagToRobot(isLeftBranch);
+      double targetAngleRelative = visionSubsystem.angleToTarget(tagId, isLeftBranch);
+      double distanceToTarget = visionSubsystem.distanceTagToRobot(tagId, isLeftBranch);
       lastUpdateTime = Timer.getFPGATimestamp();
 
       // Compute target position relative to robot
@@ -231,7 +228,6 @@ public class DriveToTagCommand extends LoggingCommand {
 
   public void end(boolean interrupted) {
     logCommandEnd(interrupted);
-    visionSubsystem.setTargetTagId(0);
     swerve.stop();
   }
 

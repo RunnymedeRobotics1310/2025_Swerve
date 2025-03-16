@@ -3,6 +3,8 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.TimestampedDoubleArray;
+import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -10,7 +12,6 @@ public class LimelightBotPose {
 
   private double[] botPose;
   private long timestampMicros;
-  private double[] standardDeviations;
 
   /* Pose Data & Avg Tag Info */
   private static final int OFFSET_POSE_X = 0;
@@ -36,22 +37,35 @@ public class LimelightBotPose {
   private static final int OFFSET_TAG_DIST_TO_ROBOT = 5;
   private static final int OFFSET_TAG_AMBIGUITY = 6;
 
-  public LimelightBotPose(double[] botPose, long timestampMicros, double[] standardDeviations) {
-    update(botPose, timestampMicros, standardDeviations);
+  /**
+   * Create a new LimelightBotPose object, initialized with no data.
+   *
+   * @see #update(TimestampedDoubleArray)'
+   */
+  public LimelightBotPose() {
+    this.botPose = new double[0];
+    this.timestampMicros = 0;
   }
 
-  public void update(double[] botPose, long timestampMicros, double[] standardDeviations) {
-    this.botPose = Objects.requireNonNullElseGet(botPose, () -> new double[0]);
-    this.timestampMicros = timestampMicros;
-    this.standardDeviations = standardDeviations;
-  }
-
-  public double[] getStandardDeviations() {
-    return standardDeviations;
+  /**
+   * Update the LimelightBotPose with new data
+   *
+   * @param botPoseData new data from the Limelight; never null
+   */
+  public void update(TimestampedDoubleArray botPoseData) {
+    Objects.requireNonNull(botPoseData, "botPoseData must not be null");
+    this.botPose = botPoseData.value;
+    this.timestampMicros = botPoseData.timestamp;
   }
 
   public Translation2d getTranslation() {
     return new Translation2d(getPoseX(), getPoseY());
+  }
+
+  public boolean isPoseValid() {
+    return (getTagCount() > 0
+        && isPoseXInBounds(0, Constants.FieldConstants.FIELD_EXTENT_METRES_X)
+        && isPoseYInBounds(0, Constants.FieldConstants.FIELD_EXTENT_METRES_Y));
   }
 
   public Pose2d getPose() {

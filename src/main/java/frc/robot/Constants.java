@@ -17,6 +17,7 @@ import frc.robot.subsystems.swerve.SwerveDriveSubsystemConfig;
 import frc.robot.subsystems.swerve.SwerveRotationConfig;
 import frc.robot.subsystems.swerve.SwerveTranslationConfig;
 import frc.robot.subsystems.vision.VisionConfig;
+import frc.robot.subsystems.vision.VisionTelemetryLevel;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,13 +123,11 @@ public final class Constants {
       new VisionConfig(
           0,
           0,
-          FieldConstants.FIELD_EXTENT_METRES_X,
-          FieldConstants.FIELD_EXTENT_METRES_Y,
           0.7,
           0.3,
           .5,
           true,
-          true);
+          VisionTelemetryLevel.VERBOSE);
 
   public static final class Swerve {
 

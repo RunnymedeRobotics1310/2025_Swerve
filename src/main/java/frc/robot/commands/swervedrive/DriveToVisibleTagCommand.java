@@ -39,11 +39,10 @@ public class DriveToVisibleTagCommand extends LoggingCommand {
     }
 
     // get offset
-    visionSubsystem.setTargetTagId(tagId);
     final double tX;
     if (visionSubsystem.isTagInView(tagId, isLeftBranch)) {
       noDataCount = 0;
-      tX = visionSubsystem.angleToTarget(isLeftBranch);
+      tX = visionSubsystem.angleToTarget(tagId, isLeftBranch);
     } else {
       noDataCount++;
       return;

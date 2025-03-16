@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision;
 
-import ca.team1310.swerve.vision.PoseEstimate;
-import ca.team1310.swerve.vision.VisionPoseCallback;
+import ca.team1310.swerve.vision.VisionPoseEstimate;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,112 +8,32 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.telemetry.Telemetry;
 
-public class LimelightVisionSubsystem extends SubsystemBase implements VisionPoseCallback {
+public class LimelightVisionSubsystem extends SubsystemBase {
 
-  private final NetworkTable nikolaVision =
-      NetworkTableInstance.getDefault().getTable("limelight-nikola");
-  private final NetworkTable thomasVision =
-      NetworkTableInstance.getDefault().getTable("limelight-thomas");
+  // Standard Deviations Used for most of the Pose Updates
+  private static final Matrix<N3, N1> MEGATAG1_STDDEV = VecBuilder.fill(0.01, 0.01, 0.05);
+  private static final Matrix<N3, N1> MEGATAG2_STDDEV = VecBuilder.fill(0.06, 0.06, 9999999);
 
-  // inputs/configs
-  private final NetworkTableEntry nikolaCamMode = nikolaVision.getEntry("camMode");
-  private final NetworkTableEntry nikolaPipeline = nikolaVision.getEntry("pipeline");
-  private final DoubleArrayPublisher nikolaRobotOrientation =
-      nikolaVision.getDoubleArrayTopic("robot_orientation_set").publish();
-
-  private final NetworkTableEntry thomasCamMode = thomasVision.getEntry("camMode");
-  private final NetworkTableEntry thomsPipeline = thomasVision.getEntry("pipeline");
-  private final DoubleArrayPublisher thomasRobotOrientation =
-      thomasVision.getDoubleArrayTopic("robot_orientation_set").publish();
-  private final DoubleEntry thomasStream = thomasVision.getDoubleTopic("stream").getEntry(-1);
+  // Orientation publishers
+  private final DoubleArrayPublisher nikolaRobotOrientation;
+  private final DoubleArrayPublisher thomasRobotOrientation;
 
   // MegaTags
-  private final DoubleArraySubscriber nikolaMegaTag1 =
-      nikolaVision.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[0]);
-  private final DoubleArraySubscriber nikolaStddevs =
-      nikolaVision.getDoubleArrayTopic("stddevs").subscribe(new double[0]);
-  private final DoubleArraySubscriber thomasMegaTag1 =
-      thomasVision.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[0]);
-  private final DoubleArraySubscriber thomasStddevs =
-      thomasVision.getDoubleArrayTopic("stddevs").subscribe(new double[0]);
+  private final DoubleArraySubscriber nikolaMegaTag;
+  private final DoubleArraySubscriber thomasMegaTag;
 
-  private final DoubleArraySubscriber nikolaMegaTag2 =
-      nikolaVision.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[0]);
-  private final DoubleArraySubscriber thomasMegaTag2 =
-      thomasVision.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[0]);
+  // These hold the data from the limelights, updated every periodic()
+  private final LimelightBotPose nikolaBotPoseCache = new LimelightBotPose();
+  private final LimelightBotPose thomasBotPoseCache = new LimelightBotPose();
 
-  public enum CamStreamType {
-    SIDE_BY_SIDE(0),
-    LIMELIGHT(1),
-    WEBCAM(2);
-
-    private final int index;
-
-    // Constructor for the enum, which assigns the index to each constant.
-    private CamStreamType(int index) {
-      this.index = index;
-    }
-
-    // Getter method to retrieve the index of the enum constant.
-    public int getIndex() {
-      return index;
-    }
-  }
-
-  public enum TagType {
-    RED_SOURCE_LEFT(1),
-    RED_SOURCE_RIGHT(2),
-    RED_PROCESSOR(3),
-    RED_REEF_1(6),
-    RED_REEF_2(7),
-    RED_REEF_3(8),
-    RED_REEF_4(9),
-    RED_REEF_5(10),
-    RED_REEF_6(11),
-    BLUE_SOURCE_LEFT(12),
-    BLUE_SOURCE_RIGHT(13),
-    BLUE_PROCESSOR(16),
-    BLUE_REEF_1(17),
-    BLUE_REEF_2(18),
-    BLUE_REEF_3(19),
-    BLUE_REEF_4(20),
-    BLUE_REEF_5(21),
-    BLUE_REEF_6(22);
-
-    private int tag;
-
-    // Constructor for the enum, which assigns the index to each constant.
-    private TagType(int tag) {
-      this.tag = tag;
-    }
-
-    // Getter method to retrieve the index of the enum constant.
-    public int getIndex() {
-      return tag;
-    }
-  }
-
-  private static final Matrix<N3, N1> POSE_DEVIATION_MEGATAG1 = VecBuilder.fill(0.01, 0.01, 0.05);
-  private static final Matrix<N3, N1> POSE_DEVIATION_MEGATAG2 =
-      VecBuilder.fill(0.06, 0.06, 9999999);
-
-  private final LimelightBotPose nikolaBotPose = new LimelightBotPose(null, 0, null);
-  private final LimelightBotPose thomasBotPose = new LimelightBotPose(null, 0, null);
-
-  private double[] orientationSet = new double[] {0, 0, 0, 0, 0, 0};
-  private double[] thomasPositionSet = new double[] {0.155, 0.13, 0.88, 179, 0, 0};
-
-  private final double fieldExtentMetresX;
-  private final double fieldExtentMetresY;
+  private final SwerveSubsystem swerve;
   private final double maxAmbiguity;
   private final double highQualityAmbiguity;
   private final double maxVisposDeltaDistanceMetres;
@@ -122,262 +41,349 @@ public class LimelightVisionSubsystem extends SubsystemBase implements VisionPos
 
   private boolean poseUpdatesEnabled = true;
 
-  private int targetTagId = 0;
-
-  public LimelightVisionSubsystem(VisionConfig visionConfig) {
-    this.fieldExtentMetresX = visionConfig.fieldExtentMetresX();
-    this.fieldExtentMetresY = visionConfig.fieldExtentMetresY();
+  public LimelightVisionSubsystem(VisionConfig visionConfig, SwerveSubsystem swerve) {
     this.maxAmbiguity = visionConfig.maxAmbiguity();
     this.highQualityAmbiguity = visionConfig.highQualityAmbiguity();
     this.maxVisposDeltaDistanceMetres = visionConfig.maxVisposeDeltaDistanceMetres();
-
-    this.nikolaPipeline.setNumber(visionConfig.pipelineAprilTagDetect());
-    this.nikolaCamMode.setNumber(visionConfig.camModeVision());
-    this.thomsPipeline.setNumber(visionConfig.pipelineAprilTagDetect());
-    this.thomasCamMode.setNumber(visionConfig.camModeVision());
     this.megatag2 = visionConfig.megatag2();
+    Telemetry.vision.telemetryLevel = visionConfig.telemetryLevel();
+    this.swerve = swerve;
 
-    Telemetry.vision.enabled = visionConfig.telemetryEnabled();
+    final NetworkTable nikola = NetworkTableInstance.getDefault().getTable("limelight-nikola");
+    final NetworkTable thomas = NetworkTableInstance.getDefault().getTable("limelight-thomas");
+
+    nikolaRobotOrientation = nikola.getDoubleArrayTopic("robot_orientation_set").publish();
+    thomasRobotOrientation = thomas.getDoubleArrayTopic("robot_orientation_set").publish();
+
+    // Initialize the NT subscribers for whichever of MT1/2 is used
+    if (megatag2) {
+      nikolaMegaTag = nikola.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[0]);
+      thomasMegaTag = thomas.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[0]);
+    } else {
+      nikolaMegaTag = nikola.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[0]);
+      thomasMegaTag = thomas.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[0]);
+    }
+
+    // inputs/configs
+    nikola.getEntry("pipeline").setNumber(visionConfig.pipelineAprilTagDetect());
+    nikola.getEntry("camMode").setNumber(visionConfig.camModeVision());
+    thomas.getEntry("pipeline").setNumber(visionConfig.pipelineAprilTagDetect());
+    thomas.getEntry("camMode").setNumber(visionConfig.camModeVision());
   }
 
   @Override
   public void periodic() {
-    TimestampedDoubleArray nikolaBotPoseBlue;
-    TimestampedDoubleArray thomasBotPoseBlue;
-    if (megatag2) {
-      nikolaBotPoseBlue = nikolaMegaTag2.getAtomic();
-      thomasBotPoseBlue = thomasMegaTag2.getAtomic();
-    } else {
-      nikolaBotPoseBlue = nikolaMegaTag1.getAtomic();
-      thomasBotPoseBlue = thomasMegaTag1.getAtomic();
-    }
+    // Update the limelight and let it know our orientation for MegaTag2
+    double[] orientationSet = new double[] {swerve.getYaw(), 0, 0, 0, 0, 0};
+    nikolaRobotOrientation.set(orientationSet);
+    thomasRobotOrientation.set(orientationSet);
 
-    double[] nikolaStddevData = nikolaStddevs.get();
-    double[] thomasStddevData = thomasStddevs.get();
-    nikolaBotPose.update(nikolaBotPoseBlue.value, nikolaBotPoseBlue.timestamp, nikolaStddevData);
-    thomasBotPose.update(thomasBotPoseBlue.value, thomasBotPoseBlue.timestamp, thomasStddevData);
+    // Pull data from the limelights and update our cache
+    nikolaBotPoseCache.update(nikolaMegaTag.getAtomic());
+    thomasBotPoseCache.update(thomasMegaTag.getAtomic());
+
+    // Publish the pose estimate to the PoseEstimator, and update telemetry
+    publishVisionPoseMeasurement();
+
+    // Update telemetry
+    updateTelemetry();
   }
 
-  /** If targetting the left reef, use the left reef pose, otherwise use the right reef pose */
+  /**
+   * If targeting the left reef, use the left reef pose, otherwise use the right reef pose
+   *
+   * @param leftBranch Are we targeting the left branch of a coral, or right branch?
+   * @return Appropriate botPose data for Nikola or Thomas based on side
+   */
   private LimelightBotPose getBotPose(boolean leftBranch) {
-    return leftBranch ? nikolaBotPose : thomasBotPose;
+    return leftBranch ? nikolaBotPoseCache : thomasBotPoseCache;
   }
 
   /* Public API */
 
+  /**
+   * Enable or disable pose updates from the vision system
+   *
+   * @param enabled true to enable, false to disable
+   */
   public void setPoseUpdatesEnabled(boolean enabled) {
     poseUpdatesEnabled = enabled;
   }
 
-  public void setThomasHeight(double height) {
-    thomasPositionSet[2] = height;
-    //    thomasCameraLocation.set(thomasPositionSet);  // TODO: Remove properly
-  }
-
-  public void setTargetTagId(TagType tag) {
-    this.targetTagId = tag.getIndex();
-  }
-
-  public void setTargetTagId(int tagId) {
-    this.targetTagId = tagId;
-  }
-
-  public void clearTargetTagId() {
-    this.targetTagId = 0;
-  }
-
+  /**
+   * Get the tag ID of the closest visible target to default limelight (nikola)
+   *
+   * @return the tag ID of the closest visible target to default limelight (nikola)
+   */
   public double getVisibleTargetTagId() {
-    return nikolaBotPose.getTagId(0);
+    return getVisibleTargetTagId(true);
   }
 
+  /**
+   * Get the tag ID of the closest visible target to the limelight handling left or right branch
+   *
+   * @param leftBranch Left or Right branch?
+   * @return the tag ID of the closest visible target to the limelight handling left or right branch
+   */
   public double getVisibleTargetTagId(boolean leftBranch) {
     return getBotPose(leftBranch).getTagId(0);
   }
 
+  /**
+   * Get the number of tags visible to the default limelight (nikola)
+   *
+   * @return the number of tags visible to the default limelight (nikola)
+   */
   public int getNumTagsVisible() {
-    return (int) nikolaBotPose.getTagCount();
+    return (int) nikolaBotPoseCache.getTagCount();
   }
 
+  /**
+   * Obtain the distance to robot centre to the tag either nearest to, or targeted if one has been
+   * set by setTargetTag(), to the default limelight (nikola)
+   *
+   * @return the distance to robot centre to the nearest or targeted tag
+   */
   public double distanceTagToRobot() {
-    return distanceTagToRobot(true);
+    return distanceTagToRobot(0, true);
   }
 
-  public double distanceTagToRobot(boolean leftBranch) {
+  /**
+   * Obtain the distance to robot centre to the tag either nearest to, or targeted if one has been
+   * set by setTargetTag(), to the limelight handling left or right branch.
+   *
+   * @param tagId Tag to use, or 0 if looking for nearest tag
+   * @param leftBranch Left or Right branch?
+   * @return the distance to robot centre to the nearest or targeted tag
+   */
+  public double distanceTagToRobot(int tagId, boolean leftBranch) {
     LimelightBotPose botPose = getBotPose(leftBranch);
 
     int index = 0;
-    if (targetTagId > 0) {
-      index = botPose.getTagIndex(targetTagId);
+    if (tagId > 0) {
+      index = botPose.getTagIndex(tagId);
     }
     return botPose.getTagDistToRobot(index);
   }
 
+  /**
+   * Obtain the distance to the camera for tag either nearest to, or targeted if one has been set by
+   * setTargetTag(), to the default limelight (nikola)
+   *
+   * @return the distance to camera to the nearest or targeted tag
+   */
   public double distanceTagToCamera() {
-    return distanceTagToCamera(true);
+    return distanceTagToCamera(0, true);
   }
 
-  public double distanceTagToCamera(boolean leftBranch) {
+  /**
+   * Obtain the distance to camera to the tag either nearest to, or targeted if one has been set by
+   * setTargetTag(), to the limelight handling left or right branch.
+   *
+   * @param tagId Tag to use, or 0 if looking for nearest tag
+   * @param leftBranch Left or Right branch?
+   * @return the distance to camera to the nearest or targeted tag
+   */
+  public double distanceTagToCamera(int tagId, boolean leftBranch) {
     LimelightBotPose botPose = getBotPose(leftBranch);
 
     int index = 0;
-    if (targetTagId > 0) {
-      index = botPose.getTagIndex(targetTagId);
+    if (tagId > 0) {
+      index = botPose.getTagIndex(tagId);
     }
     return botPose.getTagDistToCamera(index);
   }
 
+  /**
+   * Obtain the angle to the tag either nearest to, or targeted if one has been set by
+   * setTargetTag(), to the default limelight (nikola)
+   *
+   * @return the angle to the nearest or targeted tag
+   */
   public double angleToTarget() {
-    return angleToTarget(true);
+    return angleToTarget(0, true);
   }
 
-  public double angleToTarget(boolean leftBranch) {
+  /**
+   * Obtain the angle to the tag either nearest to, or targeted if one has been set by
+   * setTargetTag(), to the limelight handling left or right branch.
+   *
+   * @param tagId Tag to use, or 0 if looking for nearest tag
+   * @param leftBranch Left or Right branch?
+   * @return the angle to the nearest or targeted tag
+   */
+  public double angleToTarget(int tagId, boolean leftBranch) {
     LimelightBotPose botPose = getBotPose(leftBranch);
 
     int index = 0;
-    if (targetTagId > 0) {
-      index = botPose.getTagIndex(targetTagId);
+    if (tagId > 0) {
+      index = botPose.getTagIndex(tagId);
     }
     return -botPose.getTagTxnc(index);
   }
 
-  public double getTagAmount() {
-    return nikolaBotPose.getTagCount();
+  /**
+   * Get the number of tags visible to the default limelight (nikola)
+   *
+   * @return the number of tags visible to the default limelight (nikola)
+   */
+  public double getTagCount() {
+    return nikolaBotPoseCache.getTagCount();
   }
 
+  /**
+   * Checks if a specific tag is visible to the default limelight (nikola)
+   *
+   * @param tagId The ID of the tag to check
+   * @return If tagId is visible or not
+   */
   public boolean isTagInView(int tagId) {
     return isTagInView(tagId, true);
   }
 
+  /**
+   * Checks if a specific tag is visible to the limelight handling left or right branches.
+   *
+   * @param tagId The ID of the tag to check
+   * @return If tagId is visible or not
+   */
   public boolean isTagInView(int tagId, boolean leftBranch) {
     LimelightBotPose botPose = getBotPose(leftBranch);
     return botPose.getTagIndex(tagId) != -1;
   }
 
   /**
-   * Set the camera view to the specified stream.
-   *
-   * @param stream the camera stream to set the view to
+   * Get the pose estimate from the vision system and update swerve's odometry. This function will
+   * check there is a valid pose to be used, and then obtain either the MegaTag2 or MegaTag1 pose
+   * based on config.
    */
-  public void setCameraView(CamStreamType stream) {
-    // thomasStream.set(stream.getIndex());  //TODO: Remove properly when not needed
-  }
+  private void publishVisionPoseMeasurement() {
+    // Make sure tags are visible and pose is on-field
+    VisionPoseEstimate visionPoseEstimate = null;
 
-  public LimelightBotPose getBotPose() {
-    return nikolaBotPose;
-  }
-
-  /**
-   * Get the pose estimate from the vision system, for callback via VisionPoseCallback
-   *
-   * <p>Logic In This Function:
-   *
-   * <ol>
-   *   <li>Set the orientation of the robot from odometry into the limelight for MegaTag2 to work
-   *   <li>Ensure the latest vision pose data is valid (on field, >=1 tags visible, robot not
-   *       spinning like crazy
-   *   <li>Check tag ambiguity - if it's very low (<0.1) it means we've got a very very high
-   *       confidence set of data, and we therefore use MegaTag1 data to update pose and heading
-   *       data, which will keep MegaTag 2 honest.
-   *   <li>If ambiguity is medium (0.1-0.7), we can trust MegaTag2 as a high confidence source
-   *   <li>Otherwise, let's not use high ambiguity data at all and let Odometry do its thing
-   * </ol>
-   *
-   * @param odometryPose the current odometry pose of the robot
-   * @param yaw the current yaw of the robot
-   * @param yawRate the current yaw rate of the robot
-   * @return the pose estimate
-   */
-  public PoseEstimate getPoseEstimate(Pose2d odometryPose, double yaw, double yawRate) {
-
-    // First, update the limelight and let it know our orientation
-    orientationSet[0] = yaw;
-    nikolaRobotOrientation.set(orientationSet);
-    thomasRobotOrientation.set(orientationSet);
-
-    PoseEstimate returnVal = null;
-
-    // Get the current pose delta
-    double compareDistance = -1;
-    double compareHeading = -1;
-    double tagAmbiguity = nikolaBotPose.getTagAmbiguity(0);
-    double[] deviations = new double[] {-1, -1, -1};
-
-    LimelightPoseEstimate.PoseConfidence poseConfidence = LimelightPoseEstimate.PoseConfidence.NONE;
-    LimelightBotPose botPose = nikolaBotPose;
-
-    // If pose is 0,0 or no tags in view, we don't actually have data - return null
-    if (nikolaBotPose.getTagCount() > 0
-        && nikolaBotPose.isPoseXInBounds(0, fieldExtentMetresX)
-        && nikolaBotPose.isPoseYInBounds(0, fieldExtentMetresY)) {
-
+    if (poseUpdatesEnabled && nikolaBotPoseCache.isPoseValid()) {
       if (megatag2) {
-        poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
-        returnVal =
-            new LimelightPoseEstimate(
-                nikolaBotPose.getPose(),
-                nikolaBotPose.getTimestampSeconds() - nikolaBotPose.getTotalLatencySeconds(),
-                POSE_DEVIATION_MEGATAG2.getData());
-      }
-      // MT1: Do we have a decent signal?  i.e. Ambiguity < 0.7
-      else if (tagAmbiguity < maxAmbiguity) {
-        // Check for super good signal - ambiguity < 0.1, or we're disabled (field setup)
-        if (tagAmbiguity < highQualityAmbiguity || DriverStation.isDisabled()) {
-          // use megatag1 as is, it's rock solid
-          double[] stddevs = nikolaBotPose.getStandardDeviations();
-          deviations[0] = stddevs[0]; // MegaTag1 X Standard Deviation
-          deviations[1] = stddevs[1]; // MegaTag1 Y Standard Deviation
-          deviations[2] = stddevs[5]; // MegaTag Deg Standard Deviation
-          poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1;
-
-          returnVal =
-              new LimelightPoseEstimate(
-                  nikolaBotPose.getPose(), nikolaBotPose.getTimestampSeconds(), deviations);
-        }
-      }
-
-      if (Telemetry.vision.enabled) {
-        compareDistance =
-            botPose.getPose().getTranslation().getDistance(odometryPose.getTranslation());
-        compareHeading =
-            botPose.getPose().getRotation().getDegrees() - odometryPose.getRotation().getDegrees();
+        visionPoseEstimate = getVisionPoseMeasurementMegaTag2();
+      } else {
+        visionPoseEstimate = getVisionPoseMeasurementMegaTag1();
       }
     }
 
-    // Telemetry Handling
-    if (Telemetry.vision.enabled) {
-      Telemetry.vision.tagAmbiguity = tagAmbiguity;
-      Telemetry.vision.poseConfidence = poseConfidence;
+    // If we have an update, send it to swerve.  If not, set PoseConfidence to NONE
+    if (visionPoseEstimate != null) {
+      swerve.addVisionMeasurement(visionPoseEstimate);
+    } else {
+      Telemetry.vision.poseConfidence = LimelightPoseEstimate.PoseConfidence.NONE;
+    }
+  }
+
+  /**
+   * Get the vision pose measurement for MegaTag2. If it exists, it's pretty high quality, so use
+   * it.
+   *
+   * @return The vision pose measurement for MegaTag2
+   */
+  private VisionPoseEstimate getVisionPoseMeasurementMegaTag2() {
+    Telemetry.vision.poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG2;
+    return new LimelightPoseEstimate(
+        nikolaBotPoseCache.getPose(),
+        nikolaBotPoseCache.getTimestampSeconds() - nikolaBotPoseCache.getTotalLatencySeconds(),
+        MEGATAG2_STDDEV);
+  }
+
+  /**
+   * Get the vision pose measurement for MegaTag1. Logic is as follows:
+   *
+   * <ul>
+   *   <li>Check tag ambiguity - if it's very low (<0.1) it means we've got a high confidence set of
+   *       data, so use low standard deviation.
+   *   <li>If ambiguity is medium (0.1-0.7), use distance from tag to scale standard deviations and
+   *       trust this data as medium confidence.
+   *   <li>If ambiguity is > 0.7, don't use the data at all.
+   * </ul>
+   *
+   * @return The vision pose measurement for MegaTag1, or null if no acceptable data
+   */
+  private VisionPoseEstimate getVisionPoseMeasurementMegaTag1() {
+    double tagAmbiguity = nikolaBotPoseCache.getTagAmbiguity(0);
+
+    if (tagAmbiguity < maxAmbiguity) {
+
+      if (tagAmbiguity < highQualityAmbiguity || DriverStation.isDisabled()) {
+        // If the ambiguity is very low (< 0.1) or DriverStation disabled, high confidence pose
+        // update
+        Telemetry.vision.poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1_HIGH;
+        return new LimelightPoseEstimate(
+            nikolaBotPoseCache.getPose(),
+            nikolaBotPoseCache.getTimestampSeconds(),
+            MEGATAG1_STDDEV);
+      } else {
+        // For medium Ambiguity, only use it if we're within 0.5m.  Scale standard deviation by
+        // distance.
+        double compareDistance =
+            nikolaBotPoseCache
+                .getPose()
+                .getTranslation()
+                .getDistance(swerve.getPose().getTranslation());
+        if (compareDistance < maxVisposDeltaDistanceMetres) {
+          Telemetry.vision.poseConfidence = LimelightPoseEstimate.PoseConfidence.MEGATAG1_MED;
+          double stdDevRatio = Math.pow(nikolaBotPoseCache.getTagDistToRobot(0), 2) / 2;
+          Matrix<N3, N1> deviations = VecBuilder.fill(stdDevRatio, stdDevRatio, stdDevRatio * 5);
+          return new LimelightPoseEstimate(
+              nikolaBotPoseCache.getPose(), nikolaBotPoseCache.getTimestampSeconds(), deviations);
+        }
+      }
+    }
+
+    // If we make it here, we're lacking good vision data
+    return null;
+  }
+
+  /** Update telemetry with vision data */
+  private void updateTelemetry() {
+    if (Telemetry.vision.telemetryLevel == VisionTelemetryLevel.REGULAR
+        || Telemetry.vision.telemetryLevel == VisionTelemetryLevel.VERBOSE) {
+
+      Pose2d odometryPose = swerve.getPose();
+      double yaw = swerve.getYaw();
+
+      double compareDistance =
+          nikolaBotPoseCache.getPose().getTranslation().getDistance(odometryPose.getTranslation());
+      double compareHeading =
+          nikolaBotPoseCache.getPose().getRotation().getDegrees()
+              - odometryPose.getRotation().getDegrees();
+
       Telemetry.vision.poseDeltaMetres = compareDistance;
       Telemetry.vision.headingDeltaDegrees = compareHeading;
       Telemetry.vision.poseMetresX = odometryPose.getX();
       Telemetry.vision.poseMetresY = odometryPose.getY();
       Telemetry.vision.poseHeadingDegrees = odometryPose.getRotation().getDegrees();
-      Telemetry.vision.visionPoseX = botPose.getPoseX();
-      Telemetry.vision.visionPoseY = botPose.getPoseY();
-      Telemetry.vision.visionPoseHeading = botPose.getPoseRotationYaw();
-      Telemetry.vision.standardDeviations = deviations;
+      Telemetry.vision.visionPoseX = nikolaBotPoseCache.getPoseX();
+      Telemetry.vision.visionPoseY = nikolaBotPoseCache.getPoseY();
+      Telemetry.vision.visionPoseHeading = nikolaBotPoseCache.getPoseRotationYaw();
       Telemetry.vision.navxYaw = yaw;
       Telemetry.vision.navxYawDelta = odometryPose.getRotation().getDegrees() - yaw;
-      Telemetry.vision.poseXSeries.add(botPose.getPoseX());
-      Telemetry.vision.poseYSeries.add(botPose.getPoseY());
-      Telemetry.vision.poseDegSeries.add(botPose.getPoseRotationYaw());
-
-      Telemetry.vision.nikVisibleTags = nikolaBotPose.getVisibleTags();
-      Telemetry.vision.nikTx = nikolaBotPose.getTagTxnc(0);
-      Telemetry.vision.nikDistanceToRobot = nikolaBotPose.getTagDistToRobot(0);
-      Telemetry.vision.nikDistanceToCam = nikolaBotPose.getTagDistToCamera(0);
-
-      Telemetry.vision.tomVisibleTags = thomasBotPose.getVisibleTags();
-      Telemetry.vision.tomTx = thomasBotPose.getTagTxnc(0);
-      Telemetry.vision.tomDistanceToRobot = thomasBotPose.getTagDistToRobot(0);
-      Telemetry.vision.tomDistanceToCam = thomasBotPose.getTagDistToCamera(0);
     }
 
-    return poseUpdatesEnabled ? returnVal : null;
+    if (Telemetry.vision.telemetryLevel == VisionTelemetryLevel.VERBOSE) {
+      Telemetry.vision.poseXSeries.add(nikolaBotPoseCache.getPoseX());
+      Telemetry.vision.poseYSeries.add(nikolaBotPoseCache.getPoseY());
+      Telemetry.vision.poseDegSeries.add(nikolaBotPoseCache.getPoseRotationYaw());
+
+      Telemetry.vision.nikVisibleTags = nikolaBotPoseCache.getVisibleTags();
+      Telemetry.vision.nikTx = nikolaBotPoseCache.getTagTxnc(0);
+      Telemetry.vision.nikDistanceToRobot = nikolaBotPoseCache.getTagDistToRobot(0);
+      Telemetry.vision.nikDistanceToCam = nikolaBotPoseCache.getTagDistToCamera(0);
+
+      Telemetry.vision.tomVisibleTags = thomasBotPoseCache.getVisibleTags();
+      Telemetry.vision.tomTx = thomasBotPoseCache.getTagTxnc(0);
+      Telemetry.vision.tomDistanceToRobot = thomasBotPoseCache.getTagDistToRobot(0);
+      Telemetry.vision.tomDistanceToCam = thomasBotPoseCache.getTagDistToCamera(0);
+    }
   }
 
   @Override
   public String toString() {
-    return "ACDC Vision Subsystem";
+    return "AC/DeepSea Vision Subsystem";
   }
 }

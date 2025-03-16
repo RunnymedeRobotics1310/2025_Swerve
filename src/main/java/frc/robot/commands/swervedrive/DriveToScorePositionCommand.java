@@ -109,9 +109,6 @@ public class DriveToScorePositionCommand extends LoggingCommand {
 
       tagPose = Constants.FieldConstants.TAGS.getTagById(tagId).pose;
       this.targetHeadingDeg = tagPose.getRotation().getDegrees();
-
-      // Whatever tag we're looking at, it's the one we want.
-      visionSubsystem.setTargetTagId(tagId);
     } else {
       // Need to make sure target tag is in view to do this
       if (!visionSubsystem.isTagInView(tagId)) {
@@ -120,8 +117,8 @@ public class DriveToScorePositionCommand extends LoggingCommand {
     }
 
     double robotHeading = currentPose.getRotation().getDegrees();
-    double targetAngleRelative = visionSubsystem.angleToTarget();
-    double distanceToTarget = visionSubsystem.distanceTagToRobot();
+    double targetAngleRelative = visionSubsystem.angleToTarget(tagId, isLeftBranch);
+    double distanceToTarget = visionSubsystem.distanceTagToRobot(tagId, isLeftBranch);
 
     // Compute target position relative to robot
     double targetGlobalAngle = robotHeading + targetAngleRelative;
@@ -182,7 +179,6 @@ public class DriveToScorePositionCommand extends LoggingCommand {
 
   public void end(boolean interrupted) {
     logCommandEnd(interrupted);
-    visionSubsystem.setTargetTagId(0);
     swerve.stop();
   }
 
@@ -208,7 +204,6 @@ public class DriveToScorePositionCommand extends LoggingCommand {
               + "], deg["
               + endPose.getRotation().getDegrees()
               + "]");
-      visionSubsystem.setTargetTagId(0);
     }
     return done;
   }
