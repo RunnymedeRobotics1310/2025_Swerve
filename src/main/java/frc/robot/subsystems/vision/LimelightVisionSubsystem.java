@@ -76,11 +76,11 @@ public class LimelightVisionSubsystem extends SubsystemBase {
     // Update the limelight and let it know our orientation for MegaTag2
     double[] orientationSet = new double[] {swerve.getYaw(), 0, 0, 0, 0, 0};
     nikolaRobotOrientation.set(orientationSet);
-    thomasRobotOrientation.set(orientationSet);
+    //    thomasRobotOrientation.set(orientationSet);
 
     // Pull data from the limelights and update our cache
     nikolaBotPoseCache.update(nikolaMegaTag.getAtomic());
-    thomasBotPoseCache.update(thomasMegaTag.getAtomic());
+    //    thomasBotPoseCache.update(thomasMegaTag.getAtomic());
 
     // Publish the pose estimate to the PoseEstimator, and update telemetry
     publishVisionPoseMeasurement();
@@ -96,7 +96,8 @@ public class LimelightVisionSubsystem extends SubsystemBase {
    * @return Appropriate botPose data for Nikola or Thomas based on side
    */
   private LimelightBotPose getBotPose(boolean leftBranch) {
-    return leftBranch ? nikolaBotPoseCache : thomasBotPoseCache;
+    //    return leftBranch ? nikolaBotPoseCache : thomasBotPoseCache;
+    return nikolaBotPoseCache;
   }
 
   /* Public API */
