@@ -9,6 +9,7 @@ import frc.robot.Constants.OiConstants;
 import frc.robot.commands.auto.Score3L4LeftAutoCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.swervedrive.TeleopDriveCommand;
+import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.LimelightVisionSubsystem;
 
@@ -26,6 +27,7 @@ public class RobotContainer {
       new LimelightVisionSubsystem(Constants.VISION_CONFIG, swerveDriveSubsystem);
   private final OperatorInput operatorInput =
       new OperatorInput(OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
+  private final CoralSubsystem coralSubsystem = new CoralSubsystem();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -37,7 +39,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new Score3L4LeftAutoCommand(swerveDriveSubsystem, visionSubsystem, 0);
+    return new Score3L4LeftAutoCommand(swerveDriveSubsystem, coralSubsystem, visionSubsystem, 0);
     //    return new DriveToLeftCenterPointAutoCommand(swerveDriveSubsystem);
     //    return new Score1CoralCenterAutoCommand(swerveDriveSubsystem, visionSubsystem, 0);
   }

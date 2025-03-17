@@ -120,14 +120,7 @@ public final class Constants {
   }
 
   public static final VisionConfig VISION_CONFIG =
-      new VisionConfig(
-          0,
-          0,
-          0.7,
-          0.3,
-          .5,
-          true,
-          VisionTelemetryLevel.VERBOSE);
+      new VisionConfig(0, 0, 0.7, 0.3, .5, true, VisionTelemetryLevel.VERBOSE);
 
   public static final class Swerve {
 
@@ -382,6 +375,140 @@ public final class Constants {
         this.blueTagId = blueTagId;
         this.redTagId = redTagId;
         this.isLeftSide = isLeftSide;
+      }
+    }
+  }
+
+  public static final class CoralConstants {
+
+    /*
+     * Motor CAN IDs and inversions
+     */
+    public static final int ELEVATOR_MOTOR_CAN_ID = 40;
+    public static final int ARM_MOTOR_CAN_ID = 41;
+    public static final int INTAKE_MOTOR_CAN_ID = 42;
+    public static final boolean ELEVATOR_MOTOR_INVERTED = true;
+    public static final boolean ARM_MOTOR_INVERTED = false;
+    public static final boolean INTAKE_MOTOR_INVERTED = false;
+    /*
+     * Elevator Constants
+     */
+    public static final double ELEVATOR_MAX_SPEED = 1;
+    public static final double ELEVATOR_MAX_HEIGHT = 158;
+    public static final double ELEVATOR_TOLERANCE = 1;
+    public static final double ELEVATOR_MAX_SLEW = 0.2;
+    public static final double ELEVATOR_P = 0.05;
+    // Maximum manual tuning speed
+    public static final double ELEVATOR_TUNE_MAX_SPEED = 0.2;
+    // Safety constants near the limits
+    public static final double ELEVATOR_SLOW_ZONE_SPEED = 0.25;
+    public static final double ELEVATOR_SLOW_ZONE = 15; // encoder counts
+    public static final double ELEVATOR_METERS_PER_ENCODER_COUNT =
+        0.745 / 122.13; // TODO: fixme: WRONG
+    public static final double THOMAS_STARTING_HEIGHT = 0.88; // m
+    /*
+     * Arm Constants
+     */
+    public static final double ARM_MAX_SPEED = 0.6;
+    public static final double ARM_LOWER_LIMIT_POSITION = 0;
+    public static final double ARM_UPPER_LIMIT_POSITION = 126;
+    public static final double ARM_CAMERA_THRESHOLD_POSITION = 100;
+    public static final boolean ARM_ANGLE_ENCODER_INVERTED = false;
+    // Set the encoder offset so that the encoder reads 0.1 rotations against the hard stop
+    // This is so that the angle can go negative instead of back to 360 deg when slightly
+    // less than zero. This constant was read off the REV Hardware Client Absolute Encoder page
+    public static final double ARM_ANGLE_ENCODER_OFFSET = 0.3506509;
+    // Maximum manual tuning speed
+    public static final double ARM_TUNE_MAX_SPEED = 0.2;
+    // Pseudo PID and safe zone constants
+    public static final double ARM_ANGLE_TOLERANCE = 1.5;
+    public static final double ARM_FAST_SPEED = 0.5;
+    public static final double ARM_SLOW_ZONE_SPEED = 0.15;
+    public static final double ARM_SLOW_ZONE_ANGLE = 10;
+    /*
+     * Intake Constants
+     */
+    public static final double CORAL_INTAKE_SPEED = 0.5;
+    public static final double CORAL_OUTAKE_SPEED = 0.8;
+    public static final double CORAL_OUTAKE_SLOW_SPEED = -0.5;
+    public static final double CORAL_EJECT_SPEED = 0.7;
+    public static final double PLANT_ROTATIONS = 30;
+
+    // Elevator Heights in encoder counts
+    public enum ElevatorHeight {
+      COMPACT(0),
+      CLOSE_INTAKE(41),
+      FAR_INTAKE(32),
+      LEVEL_1(0),
+      LEVEL_2(3),
+      LEVEL_3(57),
+      LEVEL_4(ELEVATOR_MAX_HEIGHT),
+      REMOVE_LOW_ALGAE(18.5),
+      REMOVE_HIGH_ALGAE(80);
+
+      public final double encoderCount;
+
+      ElevatorHeight(double encoderCount) {
+        this.encoderCount = encoderCount;
+      }
+    }
+
+    // Arm Angles in degrees
+    public enum ArmAngle {
+      COMPACT(-1),
+      INTAKE(21),
+      LEVEL_1(0),
+      LEVEL_2(120),
+      LEVEL_3(126),
+      LEVEL_4(112),
+      REMOVE_ALGAE(74);
+
+      public final double angle;
+
+      ArmAngle(double angle) {
+        this.angle = angle;
+      }
+    }
+
+    public enum DesiredDistanceToTargetCM {
+      INTAKE(20),
+      LEVEL_1(20),
+      LEVEL_2(20),
+      LEVEL_3(20),
+      LEVEL_4(26),
+      REMOVE_ALGAE(20);
+
+      public final double distance;
+
+      DesiredDistanceToTargetCM(double distance) {
+        this.distance = distance;
+      }
+
+      public double getDistance() {
+        return distance;
+      }
+    }
+
+    // How far to the left or right you need to be from a reef tag to score
+    public static final double OFFSET_FROM_TAG_FOR_SCORING = 14;
+
+    public enum CoralPose {
+      COMPACT(ElevatorHeight.COMPACT, ArmAngle.COMPACT),
+      CLOSE_INTAKE(ElevatorHeight.CLOSE_INTAKE, ArmAngle.INTAKE),
+      FAR_INTAKE(ElevatorHeight.FAR_INTAKE, ArmAngle.INTAKE),
+      SCORE_L1(ElevatorHeight.LEVEL_1, ArmAngle.LEVEL_1),
+      SCORE_L2(ElevatorHeight.LEVEL_2, ArmAngle.LEVEL_2),
+      SCORE_L3(ElevatorHeight.LEVEL_3, ArmAngle.LEVEL_3),
+      SCORE_L4(ElevatorHeight.LEVEL_4, ArmAngle.LEVEL_4),
+      REMOVE_LOW_ALGAE(ElevatorHeight.REMOVE_LOW_ALGAE, ArmAngle.REMOVE_ALGAE),
+      REMOVE_HIGH_ALGAE(ElevatorHeight.REMOVE_HIGH_ALGAE, ArmAngle.REMOVE_ALGAE);
+
+      public final ElevatorHeight elevatorHeight;
+      public final ArmAngle armAngle;
+
+      CoralPose(ElevatorHeight elevatorHeight, ArmAngle armAngle) {
+        this.elevatorHeight = elevatorHeight;
+        this.armAngle = armAngle;
       }
     }
   }
