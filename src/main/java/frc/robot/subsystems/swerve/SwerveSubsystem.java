@@ -10,7 +10,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RunnymedeUtils;
@@ -25,6 +27,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SlewRateLimiter omegaLimiter;
   private final PIDController headingPIDController;
   private final AnalogInput ultrasonicDistanceSensor = new AnalogInput(ULTRASONIC_SENSOR_PORT);
+  private final DigitalInput beamBreak = new DigitalInput(9);
 
   private double ultrasonicVoltage;
   private double ultrasonicDistanceM;
@@ -47,6 +50,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() {
     ultrasonicVoltage = ultrasonicDistanceSensor.getVoltage();
     ultrasonicDistanceM = 1.28722 * ultrasonicVoltage - 0.53066;
+    SmartDashboard.putBoolean("Beam Break", beamBreak.get());
 
     Telemetry.drive.ultrasonicDistanceM = ultrasonicDistanceM;
     Telemetry.drive.ultrasonicVoltage = ultrasonicVoltage;
