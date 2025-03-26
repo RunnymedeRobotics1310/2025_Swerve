@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.CoralConstants.CoralPose;
+import frc.robot.RunnymedeUtils;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.coral.MoveToCoralPoseCommand;
@@ -362,6 +363,11 @@ public class OperatorInput extends SubsystemBase {
       matchNearEndTimerStarted = true;
     }
 
+    double matchTimeRemaining = RunnymedeUtils.teleopMatchTimeRemaining();
+    if (matchTimeRemaining < 0.2 && matchTimeRemaining > 0) {
+      setRumblePattern(RumblePattern.BLIP);
+    }
+
     rumbleUpdate();
   }
 
@@ -376,38 +382,36 @@ public class OperatorInput extends SubsystemBase {
   }
 
   public static void setRumblePattern(RumblePattern pattern) {
-    if (pattern != currentRumblePattern) {
-      currentRumblePattern = pattern;
-      rumbleTimer.restart();
+    synchronized (rumbleTimer) {
+      if (pattern != currentRumblePattern) {
+        currentRumblePattern = pattern;
+        rumbleTimer.restart();
+      }
     }
   }
 
   private void rumbleUpdate() {
-    if (!rumbleTimer.isRunning()) {
-      return;
-    }
+    synchronized (rumbleTimer) {
+      if (!rumbleTimer.isRunning()) {
+        return;
+      }
 
-    double time = rumbleTimer.get();
-    double rumbleAmount = 0.0;
+      double time = rumbleTimer.get();
+      double rumbleAmount = 1;
 
-    // stop after rumble duration seconds
-    if (time > currentRumblePattern.seconds) {
-      currentRumblePattern = RumblePattern.NONE;
-      rumbleTimer.stop();
-      rumbleAmount = 0.0;
-    } else {
-      rumbleAmount =
-          switch (currentRumblePattern) {
-            case SHORT, MEDIUM, RED_ALERT -> 1.0;
-            default -> 0.0;
-          };
-    }
+      // stop after rumble duration seconds
+      if (time > currentRumblePattern.seconds) {
+        currentRumblePattern = RumblePattern.NONE;
+        rumbleTimer.stop();
+        rumbleAmount = 0.0;
+      }
 
-    if (currentRumblePattern.driverController) {
-      driverController.setRumble(currentRumblePattern.rumbleType, rumbleAmount);
-    }
-    if (currentRumblePattern.operatorController) {
-      operatorController.setRumble(currentRumblePattern.rumbleType, rumbleAmount);
+      if (currentRumblePattern.driverController) {
+        driverController.setRumble(currentRumblePattern.rumbleType, rumbleAmount);
+      }
+      if (currentRumblePattern.operatorController) {
+        operatorController.setRumble(currentRumblePattern.rumbleType, rumbleAmount);
+      }
     }
   }
 

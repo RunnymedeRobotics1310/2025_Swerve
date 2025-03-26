@@ -26,6 +26,8 @@ public class LimelightVisionSubsystem extends SubsystemBase {
   public LimelightVisionSubsystem(VisionConfig visionConfig, SwerveSubsystem swerve) {
     this.swerve = swerve;
 
+    Telemetry.vision.telemetryLevel = visionConfig.telemetryLevel();
+
     final NetworkTable nikola =
         NetworkTableInstance.getDefault().getTable("limelight-" + VISION_PRIMARY_LIMELIGHT_NAME);
     final NetworkTable thomas =
@@ -70,7 +72,7 @@ public class LimelightVisionSubsystem extends SubsystemBase {
       if ((tagId >= 6 && tagId <= 11) || (tagId >= 17 && tagId <= 22)) {
         double tx = Math.abs(botPose.getTagTxnc(0));
         // If we're super close to centered, rumble
-        if (tx < 0.1) {
+        if (tx < 1) {
           OperatorInput.setRumblePattern(rumblePattern);
         }
       }
