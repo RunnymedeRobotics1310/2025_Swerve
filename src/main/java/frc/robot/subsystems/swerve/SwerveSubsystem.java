@@ -1,39 +1,42 @@
 package frc.robot.subsystems.swerve;
 
+import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.Swerve.ULTRASONIC_SENSOR_PORT;
+import static frc.robot.Constants.VisionConstants.VISION_PRIMARY_LIMELIGHT_NAME;
 
+import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.core.SwerveMath;
-import ca.team1310.swerve.odometry.FieldAwareSwerveDrive;
 import ca.team1310.swerve.utils.SwerveUtils;
-import ca.team1310.swerve.vision.VisionPoseEstimate;
+import ca.team1310.swerve.vision.LimelightAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.RunnymedeUtils;
 import frc.robot.telemetry.Telemetry;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-  private final FieldAwareSwerveDrive drive;
+  private final RunnymedeSwerveDrive drive;
   private final SwerveDriveSubsystemConfig config;
   private final SlewRateLimiter xLimiter;
   private final SlewRateLimiter yLimiter;
   private final SlewRateLimiter omegaLimiter;
   private final PIDController headingPIDController;
   private final AnalogInput ultrasonicDistanceSensor = new AnalogInput(ULTRASONIC_SENSOR_PORT);
-  private final DigitalInput beamBreak = new DigitalInput(9);
 
   private double ultrasonicVoltage;
   private double ultrasonicDistanceM;
 
   public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
-    this.drive = new FieldAwareSwerveDrive(config.coreConfig());
+    this.drive =
+        new LimelightAwareSwerveDrive(
+            config.coreConfig(),
+            VISION_PRIMARY_LIMELIGHT_NAME,
+            FIELD_EXTENT_METRES_X,
+            FIELD_EXTENT_METRES_Y);
     this.config = config;
     this.xLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
     this.yLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
@@ -45,14 +48,14 @@ public class SwerveSubsystem extends SubsystemBase {
             config.rotationConfig().headingD());
     headingPIDController.enableContinuousInput(-180, 180);
     headingPIDController.setTolerance(2);
+    Telemetry.drive.enabled = config.telemetryEnabled();
   }
 
   public void periodic() {
     ultrasonicVoltage = ultrasonicDistanceSensor.getVoltage();
-    ultrasonicDistanceM = 1.28722 * ultrasonicVoltage - 0.53066;
-    SmartDashboard.putBoolean("Beam Break", beamBreak.get());
+    ultrasonicDistanceM = 1.29338 * ultrasonicVoltage - 0.51803;
 
-    Telemetry.drive.ultrasonicDistanceM = ultrasonicDistanceM;
+    Telemetry.drive.ultrasonicDistanceM = Math.round(ultrasonicDistanceM * 1000d) / 1000d;
     Telemetry.drive.ultrasonicVoltage = ultrasonicVoltage;
   }
 
@@ -218,22 +221,23 @@ public class SwerveSubsystem extends SubsystemBase {
     drive.setModuleState(moduleName, speed, angle);
   }
 
-  /**
-   * Update odometry with a sample from Vision
-   *
-   * @param visionPoseEstimate the pose estimate from vision
-   */
-  public void addVisionMeasurement(VisionPoseEstimate visionPoseEstimate) {
-    drive.addVisionMeasurement(visionPoseEstimate);
-  }
-
   @Override
   public String toString() {
     Pose2d pose = getPose();
     double x = pose.getX();
     double y = pose.getY();
     double theta = pose.getRotation().getDegrees();
-    return String.format("SwerveDriveSubsystem Pose: %.2f,%.2f @ %.1f deg", x, y, theta);
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName())
+        .append(": Pose: ")
+        .append(Math.round(x * 100d) / 100d)
+        .append(",")
+        .append(Math.round(y * 100d) / 100d)
+        .append(",")
+        .append(Math.round(theta * 10d) / 10d);
+
+    return sb.toString();
   }
 
   /*
@@ -265,12 +269,12 @@ public class SwerveSubsystem extends SubsystemBase {
     return Math.min(omega, maxOmegaRadPerSec);
   }
 
-  public double computeTranslateVelocity(double distance, double tolerance) {
+  public double computeTranslateVelocity(double distance, double maxSpeedMPS, double tolerance) {
     final double decelZoneMetres = 1.2;
     final double verySlowZone = 0.2;
     final double verySlowSpeed = 0.15;
-    double maxSpeedMPS = Constants.Swerve.TRANSLATION_CONFIG.maxSpeedMPS();
-    maxSpeedMPS = 2;
+    //    double maxSpeedMPS = Constants.Swerve.TRANSLATION_CONFIG.maxSpeedMPS();
+    //    maxSpeedMPS = 3.5;
     double speed;
 
     final double absDist = Math.abs(distance);

@@ -7,7 +7,6 @@ import static frc.robot.telemetry.Telemetry.PREFIX;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.vision.LimelightPoseEstimate;
 import frc.robot.subsystems.vision.VisionTelemetryLevel;
 
 /**
@@ -21,47 +20,43 @@ public class VisionTelemetry {
 
   // Pose
   /** The x location of the robot with respect to the field in metres */
-  public double poseMetresX = Double.MIN_VALUE;
+  public double poseMetresX = -1;
 
   /** The y location of the robot with respect to the field in metres */
-  public double poseMetresY = Double.MIN_VALUE;
+  public double poseMetresY = -1;
 
   /** The heading of the robot with respect to the field in degrees */
-  public double poseHeadingDegrees = Double.MIN_VALUE;
+  public double poseHeadingDegrees = -1310;
 
   /**
    * The x location of the robot with respect to the field as measured by the vision system in
    * metres
    */
-  public double visionPoseX = Double.MIN_VALUE;
+  public double visionPoseX = -1;
 
   /**
    * The y location of the robot with respect to the field as measured by the vision system in
    * metres
    */
-  public double visionPoseY = Double.MIN_VALUE;
+  public double visionPoseY = -1;
 
   /**
    * The heading of the robot with respect to the field as measured by the vision system in degrees
    */
-  public double visionPoseHeading = Double.MIN_VALUE;
+  public double visionPoseHeading = -1310;
 
   /** The distance offset of vision pose to odometry */
-  public double poseDeltaMetres = Double.MIN_VALUE;
+  public double poseDeltaMetres = -1310;
 
   /** The heading offset of vision pose to odometry */
-  public double headingDeltaDegrees = Double.MIN_VALUE;
-
-  /** The confidence of the pose estimate */
-  public LimelightPoseEstimate.PoseConfidence poseConfidence =
-      LimelightPoseEstimate.PoseConfidence.NONE;
+  public double headingDeltaDegrees = -1310;
 
   /** The tag ambiguity of the currently in focus tag */
-  public double tagAmbiguity = Double.MIN_VALUE;
+  public double tagAmbiguity = -1;
 
-  public double navxYaw = Double.MIN_VALUE;
+  public double navxYaw = -1310;
 
-  public double navxYawDelta = Double.MIN_VALUE;
+  public double navxYawDelta = -1310;
 
   public TimeSeriesMetric poseXSeries = new TimeSeriesMetric();
   public TimeSeriesMetric poseYSeries = new TimeSeriesMetric();
@@ -84,6 +79,7 @@ public class VisionTelemetry {
   }
 
   void post() {
+
     if (Telemetry.vision.telemetryLevel == VisionTelemetryLevel.REGULAR
         || Telemetry.vision.telemetryLevel == VisionTelemetryLevel.VERBOSE) {
       String poseOdo =
@@ -96,8 +92,6 @@ public class VisionTelemetry {
 
       String poseDelta = String.format("%.2fm, %.1f°", poseDeltaMetres, headingDeltaDegrees);
       SmartDashboard.putString(PREFIX + "Vision/pose_delta", poseDelta);
-
-      SmartDashboard.putString(PREFIX + "Vision/pose_confidence", poseConfidence.toString());
 
       SmartDashboard.putNumber(PREFIX + "Vision/tag_ambiguity", tagAmbiguity);
 

@@ -31,6 +31,17 @@ import java.util.Map;
  */
 public final class Constants {
 
+  public static final class TelemetryConfig {
+    public static boolean drive = true;
+    public static VisionTelemetryLevel vision = VisionTelemetryLevel.NONE;
+    public static TelemetryLevel swerve = TelemetryLevel.VERBOSE;
+    public static boolean test = false;
+    public static boolean oi = false;
+    public static boolean coral = false;
+    public static boolean climb = false;
+    public static boolean pneumatics = false;
+  }
+
   public static final class RobotConfig {
     public static final double LENGTH_METRES = 0.71;
     public static final double WIDTH_METRES = 0.71;
@@ -38,16 +49,25 @@ public final class Constants {
     public static final double BUMPER_WIDTH = 0.0;
   }
 
+  public static final class VisionConstants {
+    public static final VisionConfig VISION_CONFIG =
+        new VisionConfig(0, 0, 0.7, 0.1, .5, true, Constants.TelemetryConfig.vision);
+
+    public static final String VISION_PRIMARY_LIMELIGHT_NAME = "nikola";
+    public static final String VISION_SECONDARY_LIMELIGHT_NAME = "thomas";
+  }
+
   public static final class OiConstants {
 
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
+    public static final double CONTROLLER_DEADBAND = .2;
 
     /**
      * Standard drive speed factor. Regular teleop drive will use this factor of the max
      * translational speed.
      */
-    public static final double GENERAL_SPEED_FACTOR = .4;
+    public static final double GENERAL_SPEED_FACTOR = .5;
 
     /**
      * Maximum drive speed factor. When boosting, this factor will be multiplied against the max
@@ -60,12 +80,18 @@ public final class Constants {
      * against the max translational speed.
      */
     public static final double SLOW_SPEED_FACTOR = .1;
+
+    /**
+     * Operator tune factor for tuning robot oriented at reef. This factor will be multiplied
+     * against the max translational speed.
+     */
+    public static final double OPERATOR_SPEED_FACTOR = 0.1;
   }
 
   public static final class FieldConstants {
 
-    public static final double FIELD_EXTENT_METRES_Y = 8.211;
-    public static final double FIELD_EXTENT_METRES_X = 16.541;
+    public static final double FIELD_EXTENT_METRES_Y = 8.052;
+    public static final double FIELD_EXTENT_METRES_X = 17.55;
 
     // This is physical tag locations on field, from 2025FieldDrawings.pdf but the heading is
     // swapped 180 degrees to indicate heading to face the tag, vs the orientation the tag is facing
@@ -118,9 +144,6 @@ public final class Constants {
       }
     }
   }
-
-  public static final VisionConfig VISION_CONFIG =
-      new VisionConfig(0, 0, 0.7, 0.3, .5, true, VisionTelemetryLevel.VERBOSE);
 
   public static final class Swerve {
 
@@ -247,11 +270,11 @@ public final class Constants {
             FRONT_RIGHT,
             BACK_LEFT,
             BACK_RIGHT,
-            TelemetryLevel.VERBOSE);
+            Constants.TelemetryConfig.swerve);
 
     public static final SwerveDriveSubsystemConfig SUBSYSTEM_CONFIG =
         new SwerveDriveSubsystemConfig(
-            true, CORE_SWERVE_CONFIG, TRANSLATION_CONFIG, ROTATION_CONFIG);
+            true, CORE_SWERVE_CONFIG, TRANSLATION_CONFIG, ROTATION_CONFIG, TelemetryConfig.drive);
 
     // Ultrasonic port
     public static final int ULTRASONIC_SENSOR_PORT = 0;
@@ -263,7 +286,9 @@ public final class Constants {
     public enum AutoPattern {
       DO_NOTHING,
       EXIT_ZONE,
-      OPTIMISTIC_AUTO
+      SCORE_3_LEFT,
+      SCORE_3_RIGHT,
+      SCORE_1_CENTER,
     }
 
     public enum Delay {
@@ -280,22 +305,22 @@ public final class Constants {
     public enum FieldLocation {
       // Generalized Multi Alliance Locations
       PRE_SCORE_LEFT_1(new Pose2d(2.8126, 4.1909, Rotation2d.fromDegrees(0)), 18, 7, true),
-      PRE_SCORE_LEFT_2(new Pose2d(3.5085, 5.3948, Rotation2d.fromDegrees(300)), 19, 6, false),
+      PRE_SCORE_LEFT_2(new Pose2d(3.2585, 5.8278, Rotation2d.fromDegrees(300)), 19, 6, false),
       PRE_SCORE_LEFT_3(new Pose2d(3.7943, 5.5598, Rotation2d.fromDegrees(300)), 19, 6, true),
       PRE_SCORE_LEFT_4(new Pose2d(5.1843, 5.5598, Rotation2d.fromDegrees(240)), 20, 11, false),
       PRE_SCORE_LEFT_5(new Pose2d(5.4701, 5.3948, Rotation2d.fromDegrees(240)), 20, 11, true),
       PRE_SCORE_LEFT_6(new Pose2d(6.1660, 4.16, Rotation2d.fromDegrees(180)), 21, 10, false),
       PRE_SCORE_RIGHT_1(new Pose2d(2.8126, 3.8609, Rotation2d.fromDegrees(0)), 18, 7, false),
-      PRE_SCORE_RIGHT_2(new Pose2d(3.5085, 2.6570, Rotation2d.fromDegrees(60)), 17, 8, true),
-      PRE_SCORE_RIGHT_3(new Pose2d(3.92, 2.58, Rotation2d.fromDegrees(60)), 17, 8, false),
-      PRE_SCORE_RIGHT_4(new Pose2d(5.38, 2.46, Rotation2d.fromDegrees(120)), 22, 9, true),
+      PRE_SCORE_RIGHT_2(new Pose2d(3.25, 2.23, Rotation2d.fromDegrees(60)), 17, 8, true),
+      PRE_SCORE_RIGHT_3(new Pose2d(3.7943, 2.64, Rotation2d.fromDegrees(60)), 17, 8, false),
+      PRE_SCORE_RIGHT_4(new Pose2d(5.1843, 2.5, Rotation2d.fromDegrees(120)), 22, 9, true),
       PRE_SCORE_RIGHT_5(new Pose2d(5.4701, 2.6570, Rotation2d.fromDegrees(120)), 22, 9, false),
       PRE_SCORE_RIGHT_6(new Pose2d(6.1660, 3.8609, Rotation2d.fromDegrees(180)), 21, 10, true),
       PRE_INTAKE_CENTRE_LEFT_STATION(new Pose2d(1.139, 7.000, Rotation2d.fromDegrees(126)), 13, 1),
       PRE_INTAKE_CENTRE_RIGHT_STATION(new Pose2d(1.139, 1.052, Rotation2d.fromDegrees(234)), 12, 2),
 
       // Legacy Alliance Specific Locations
-      blueRightOuterStation(new Pose2d(1.7, 1.7, Rotation2d.fromDegrees(234)), 12, 2),
+      blueRightOuterStation(new Pose2d(1.15, 1.02, Rotation2d.fromDegrees(234)), 12, 2),
       blueLeftOuterStation(new Pose2d(1.15, 7.03, Rotation2d.fromDegrees(-234)), 13, 1),
 
       // Reef Score Locations (Lettered as seen in manual - counter-clockwise starting from

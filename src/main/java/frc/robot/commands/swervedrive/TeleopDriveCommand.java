@@ -17,12 +17,16 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.commands.LoggingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.vision.LimelightVisionSubsystem;
 
-public class TeleopDriveCommand extends BaseDriveCommand {
+public class TeleopDriveCommand extends LoggingCommand {
 
+  private final SwerveSubsystem swerve;
   private final OperatorInput oi;
+  private final LimelightVisionSubsystem visionSubsystem;
   private boolean invert;
   private Double headingSetpointDeg = null;
   private boolean fieldOriented = true;
@@ -30,14 +34,19 @@ public class TeleopDriveCommand extends BaseDriveCommand {
   private boolean prevRotate180Val = false;
 
   /** Used to drive a swerve robot in full field-centric mode. */
-  public TeleopDriveCommand(SwerveSubsystem swerve, OperatorInput operatorInput) {
-    super(swerve);
+  public TeleopDriveCommand(
+      SwerveSubsystem swerve,
+      LimelightVisionSubsystem visionSubsystem,
+      OperatorInput operatorInput) {
+    this.swerve = swerve;
+    this.visionSubsystem = visionSubsystem;
     this.oi = operatorInput;
+    addRequirements(swerve);
   }
 
   @Override
   public void initialize() {
-    super.initialize();
+    logCommandStart();
     rotationSettleTimer.start();
     rotationSettleTimer.reset();
     headingSetpointDeg = null;
@@ -58,8 +67,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
   // @Override
   @Override
   public void execute() {
-    super.execute();
-
     final boolean isZeroGyro = oi.isZeroGyro();
 
     // With the driver standing behind the driver station glass, "forward" on the left stick is
@@ -74,10 +81,10 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     final double vY = -oi.getDriverControllerAxis(LEFT, X);
 
     // Operator x for fine-tuning robot oriented
-    final double oX = 0;
+    final double oX = Math.pow(oi.getOperatorControllerAxis(LEFT, Y), 3) * OPERATOR_SPEED_FACTOR;
 
     // Operator y for fine-tuning robot oriented
-    final double oY = 0;
+    final double oY = Math.pow(-oi.getOperatorControllerAxis(LEFT, X), 3) * OPERATOR_SPEED_FACTOR;
 
     // Left and right on the right stick will change the direction the robot is facing - its
     // heading. Positive x values on the stick translate to clockwise motion, and vice versa.
@@ -198,7 +205,7 @@ public class TeleopDriveCommand extends BaseDriveCommand {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    super.end(interrupted);
+    logCommandEnd(interrupted);
     headingSetpointDeg = null;
     rotationSettleTimer.reset();
   }
@@ -206,7 +213,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    super.isFinished();
     return false;
   }
 
@@ -222,9 +228,6 @@ public class TeleopDriveCommand extends BaseDriveCommand {
     Translation2d input = new Translation2d(vX, vY);
     double magnitude = input.getNorm();
     Rotation2d angle = magnitude > 1e-6 ? input.getAngle() : new Rotation2d();
-
-    // cube to allow more fine-grained control for user at low values
-    magnitude = Math.pow(magnitude, 3);
 
     // apply boost factor
     magnitude *= boostFactor;

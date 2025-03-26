@@ -7,14 +7,13 @@ import static frc.robot.Constants.CoralConstants.CoralPose.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RunnymedeUtils;
 import frc.robot.commands.coral.MoveToCoralPoseCommand;
+import frc.robot.commands.coral.elevator.MoveElevatorToHeightCommand;
 import frc.robot.commands.coral.intake.IntakeCoralCommand;
 import frc.robot.commands.coral.intake.PlantCoralCommand;
-import frc.robot.commands.swervedrive.DriveRobotOrientedCommand;
-import frc.robot.commands.swervedrive.DriveThroughFieldLocationCommand;
-import frc.robot.commands.swervedrive.DriveToFieldLocationCommand;
-import frc.robot.commands.swervedrive.DriveToVisibleTagCommand;
+import frc.robot.commands.swervedrive.*;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.LimelightVisionSubsystem;
@@ -25,6 +24,7 @@ public class BaseAutoCommand extends SequentialCommandGroup {
   private final LimelightVisionSubsystem vision;
   private final CoralSubsystem coral;
   private double allianceOffset = 0;
+  private final double speed = 3.5;
 
   public BaseAutoCommand(
       SwerveSubsystem swerve, LimelightVisionSubsystem vision, CoralSubsystem coral) {
@@ -52,27 +52,47 @@ public class BaseAutoCommand extends SequentialCommandGroup {
     return new PlantCoralCommand(coral);
   }
 
-  protected Command approachReef(boolean isLeftBranch) {
-    return new DriveToVisibleTagCommand(swerve, vision, isLeftBranch)
-        .alongWith(setCoralPose(SCORE_L4));
+  protected Command approachReef(FieldLocation location) {
+    return new DriveToReefTagCommand(swerve, vision, location).alongWith(setCoralPose(SCORE_L4));
   }
 
   public Command goScoreL4Coral(FieldLocation location) {
     double locationHeading = location.pose.getRotation().getDegrees() + allianceOffset;
 
-    return driveThroughLocation(location, 2)
-        .andThen(approachReef(location.isLeftSide))
+    return driveThroughLocation(location, speed)
+        .andThen(approachReef(location))
         .andThen(plant())
-        .andThen(new DriveRobotOrientedCommand(swerve, -0.2, 0, locationHeading).withTimeout(1))
+        .andThen(new DriveRobotOrientedCommand(swerve, -0.5, 0, locationHeading).withTimeout(0.1))
         .andThen(setCoralPose(COMPACT));
+  }
+
+  public Command scoreL4CoralStop(FieldLocation location) {
+    return driveThroughLocation(location, speed)
+        .raceWith(setCoralPose(SCORE_L3))
+        .andThen(approachReef(location))
+        .andThen(plant());
   }
 
   public Command autoIntake(FieldLocation location) {
     double locationHeading = location.pose.getRotation().getDegrees() + allianceOffset;
 
-    return driveThroughLocation(location, 2)
+    return driveThroughLocation(location, speed)
+        .andThen(new DriveIntoWallCommand(swerve, 0.25, 0, locationHeading))
+        .alongWith(new IntakeCoralCommand(coral, false));
+  }
+
+  public Command scoreL4CoralAndIntake(FieldLocation reefLocation, FieldLocation intakeLocation) {
+    double reefHeading = reefLocation.pose.getRotation().getDegrees() + allianceOffset;
+    double intakeHeading = intakeLocation.pose.getRotation().getDegrees() + allianceOffset;
+
+    return scoreL4CoralStop(reefLocation)
+        .andThen(new DriveRobotOrientedCommand(swerve, -0.5, 0, reefHeading).withTimeout(0.5))
         .andThen(
-            new IntakeCoralCommand(coral, false)
-                .deadlineFor(new DriveRobotOrientedCommand(swerve, 0.25, 0, locationHeading)));
+            new WaitCommand(0.2)
+                .andThen(setCoralPose(COMPACT))
+                .andThen(new IntakeCoralCommand(coral, false))
+                .deadlineFor(
+                    driveThroughLocation(intakeLocation, 3)
+                        .andThen(new DriveIntoWallCommand(swerve, 0.25, 0, intakeHeading))));
   }
 }

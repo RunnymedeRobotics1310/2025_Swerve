@@ -24,6 +24,7 @@ public class DriveToTagCommand extends LoggingCommand {
   private final Constants.AutoConstants.FieldLocation fieldLocation;
 
   private int tagId = 0;
+  private Pose2d targetPose;
 
   private boolean noTagsAbort = false;
   private boolean noDataTimeout = false;
@@ -79,14 +80,14 @@ public class DriveToTagCommand extends LoggingCommand {
     noTagsAbort = noDataTimeout = reachedTarget = false;
 
     // If No field location, use the closest tag
-    Pose2d tagPose = initTag();
-    if (tagPose == null) {
+    targetPose = initTag();
+    if (targetPose == null) {
       noTagsAbort = true;
       return;
     }
 
     // Calculate the target position based on tag with side and backwards offsets
-    calcTargetPosition(tagPose.getRotation().getDegrees());
+    calcTargetPosition(targetPose.getRotation().getDegrees());
 
     // Initialize our data
     calcTarget();
@@ -178,7 +179,7 @@ public class DriveToTagCommand extends LoggingCommand {
       // Normalize direction and apply speed
       speedX = speedMultiplier * MAX_SPEED * Math.cos(targetAngleRelative);
       speedY = speedMultiplier * MAX_SPEED * Math.sin(targetAngleRelative);
-      omega = swerve.computeOmega(targetGlobalAngle);
+      omega = swerve.computeOmega(targetPose.getRotation().getDegrees());
 
       // Time estimate remaining
       travelTimeEstimate =
@@ -188,6 +189,8 @@ public class DriveToTagCommand extends LoggingCommand {
       SmartDashboard.putNumber("1310/DriveToTagCommand/distanceY", distanceY);
       SmartDashboard.putNumber("1310/DriveToTagCommand/targetX", targetX);
       SmartDashboard.putNumber("1310/DriveToTagCommand/targetY", targetY);
+      SmartDashboard.putNumber("1310/DriveToTagCommand/speedX", speedX);
+      SmartDashboard.putNumber("1310/DriveToTagCommand/speedY", speedY);
       SmartDashboard.putNumber("1310/DriveToTagCommand/targetAngle", targetGlobalAngle);
     }
 

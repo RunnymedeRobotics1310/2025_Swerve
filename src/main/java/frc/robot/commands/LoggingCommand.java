@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.text.SimpleDateFormat;
@@ -16,7 +17,7 @@ public class LoggingCommand extends Command {
 
   SimpleDateFormat START_TIMESTAMP_FMT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-  protected long initializeTime = 0;
+  protected double initializeTime = 0;
   private String finishReason = null;
 
   List<Subsystem> subsystemList = new ArrayList<>();
@@ -47,8 +48,8 @@ public class LoggingCommand extends Command {
    * @param timeout to check, in seconds
    * @return {@code true} if the timeout has been exceeded, {@code false} otherwise
    */
-  public boolean isTimeoutExceeded(double timeout) {
-    return (System.currentTimeMillis() - initializeTime) / 1000.0d > timeout;
+  public boolean hasElapsed(double timeout) {
+    return Timer.getFPGATimestamp() - initializeTime > timeout;
   }
 
   /**
@@ -74,7 +75,7 @@ public class LoggingCommand extends Command {
     logCommandState("STARTING", commandParms, true);
 
     // Set the initialize time after logging of the start message.
-    initializeTime = System.currentTimeMillis();
+    initializeTime = Timer.getFPGATimestamp();
   }
 
   /**
@@ -178,7 +179,7 @@ public class LoggingCommand extends Command {
     if (initializeTime == 0) {
       sb.append(" at ").append(START_TIMESTAMP_FMT.format(new Date()));
     } else {
-      sb.append(" at ").append(System.currentTimeMillis() - initializeTime).append("ms");
+      sb.append(" at ").append(Timer.getFPGATimestamp() - initializeTime).append("s");
     }
 
     if (finishReason != null) {
@@ -193,12 +194,12 @@ public class LoggingCommand extends Command {
       // Print the subsystems as passed in on the command start
       for (Subsystem subsystem : subsystemList) {
         if (subsystem != null) {
-          sb.append("\n   ").append(subsystem);
+          sb.append("\n   ").append(subsystem.toString());
         }
       }
     }
 
-    System.out.println(sb);
+    System.out.println(sb.toString());
   }
 
   public static String format(double d) {

@@ -232,7 +232,7 @@ public class SystemTestCommand extends LoggingCommand {
     // This allows the user to start this command using the start and back
     // button combination without cancelling on the start button as
     // the user releases the buttons
-    if (!isTimeoutExceeded(0.5d)) {
+    if (!hasElapsed(0.5d)) {
       return false;
     }
 

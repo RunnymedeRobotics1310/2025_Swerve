@@ -20,6 +20,7 @@ public class DriveToFieldLocationCommand extends LoggingCommand {
   public DriveToFieldLocationCommand(SwerveSubsystem swerve, FieldLocation location) {
     this.swerve = swerve;
     this.location = location.pose;
+    addRequirements(swerve);
   }
 
   public DriveToFieldLocationCommand(
@@ -27,6 +28,7 @@ public class DriveToFieldLocationCommand extends LoggingCommand {
     this.swerve = swerve;
     this.location = location.pose;
     this.tolerance = toleranceM;
+    addRequirements(swerve);
   }
 
   @Override
@@ -56,8 +58,8 @@ public class DriveToFieldLocationCommand extends LoggingCommand {
     //        log("Xdif: " + xDif + " Ydif: " + yDif + " ºdif: " + angleDif);
 
     swerve.driveFieldOriented(
-        swerve.computeTranslateVelocity(xDif, 0.02),
-        swerve.computeTranslateVelocity(yDif, 0.02),
+        swerve.computeTranslateVelocity(xDif, 3, 0.02),
+        swerve.computeTranslateVelocity(yDif, 3, 0.02),
         swerve.computeOmega(targetHeadingDeg));
   }
 
