@@ -194,13 +194,14 @@ public final class Constants {
             /* motor hardware type */ MotorType.NEO_SPARK_FLEX,
             /* inverted? */ false,
             /* current limit (A) */ 40,
-            /* current limit (A) */ 12,
-            /* ramp rate 0 to full power (s)*/ 0.25,
+            /* nominal voltage (V) */ 12,
+            /* ramp rate 0 to full power (s)*/ 0.25, // TODO: FIXME: TRY LOWERING THIS A LOT
             /* drive motor gear ratio */ 6.75 /* SDS MK4i L2 --> 6.75:1 */,
             /* drive motor PID p */ 0.11,
             /* drive motor PID i */ 0,
             /* drive motor PID d */ 0,
-            /* drive motor PID ff */ 0,
+            /* drive motor PID ff */ 0, // TODO: FIXME: KEEP THIS ZERO BUT SET IN CONTROLLER BASED
+            // ON VELOCITY
             /* drive motor PID izone */ 0);
 
     private static final EncoderConfig ANGLE_ENCODER_CONFIG = new EncoderConfig(false, 0.005, 5);
