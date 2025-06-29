@@ -148,10 +148,10 @@ public final class Constants {
   public static final class Swerve {
 
     /** Front to back from the middle of the wheels */
-    public static final double WHEEL_BASE_METRES = inchesToMeters(22.75);
+    public static final double WHEEL_BASE_METRES = inchesToMeters(16.75);
 
     /** Side to side from the middle of the wheels */
-    public static final double TRACK_WIDTH_METRES = inchesToMeters(21.75);
+    public static final double TRACK_WIDTH_METRES = inchesToMeters(16.75);
 
     public static final double SDS_MK4I_WHEEL_RADIUS_M = 0.051;
 
@@ -208,45 +208,6 @@ public final class Constants {
     public static final ModuleConfig FRONT_LEFT =
         new ModuleConfig(
             "frontleft",
-            new Coordinates(TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2),
-            SDS_MK4I_WHEEL_RADIUS_M,
-            30,
-            DRIVE_MOTOR_CONFIG,
-            31,
-            ANGLE_MOTOR_CONFIG,
-            32,
-            Rotation2d.fromRotations(0.857910).getDegrees(),
-            ANGLE_ENCODER_CONFIG);
-
-    public static final ModuleConfig FRONT_RIGHT =
-        new ModuleConfig(
-            "frontright",
-            new Coordinates(TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2),
-            SDS_MK4I_WHEEL_RADIUS_M,
-            35,
-            DRIVE_MOTOR_CONFIG,
-            36,
-            ANGLE_MOTOR_CONFIG,
-            37,
-            Rotation2d.fromRotations(0.001953).getDegrees(),
-            ANGLE_ENCODER_CONFIG);
-
-    public static final ModuleConfig BACK_LEFT =
-        new ModuleConfig(
-            "backleft",
-            new Coordinates(-TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2),
-            SDS_MK4I_WHEEL_RADIUS_M,
-            20,
-            DRIVE_MOTOR_CONFIG,
-            21,
-            ANGLE_MOTOR_CONFIG,
-            22,
-            Rotation2d.fromRotations(0.909180).getDegrees(),
-            ANGLE_ENCODER_CONFIG);
-
-    public static final ModuleConfig BACK_RIGHT =
-        new ModuleConfig(
-            "backright",
             new Coordinates(-TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2),
             SDS_MK4I_WHEEL_RADIUS_M,
             10,
@@ -254,7 +215,46 @@ public final class Constants {
             11,
             ANGLE_MOTOR_CONFIG,
             12,
-            Rotation2d.fromRotations(0.781982).getDegrees(),
+            Rotation2d.fromRotations(0.283203).getDegrees(),
+            ANGLE_ENCODER_CONFIG);
+
+    public static final ModuleConfig FRONT_RIGHT =
+        new ModuleConfig(
+            "frontright",
+            new Coordinates(-TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2),
+            SDS_MK4I_WHEEL_RADIUS_M,
+            20,
+            DRIVE_MOTOR_CONFIG,
+            21,
+            ANGLE_MOTOR_CONFIG,
+            22,
+            Rotation2d.fromRotations(0.403809).getDegrees(),
+            ANGLE_ENCODER_CONFIG);
+
+    public static final ModuleConfig BACK_RIGHT =
+        new ModuleConfig(
+            "backright",
+            new Coordinates(TRACK_WIDTH_METRES / 2, WHEEL_BASE_METRES / 2),
+            SDS_MK4I_WHEEL_RADIUS_M,
+            30,
+            DRIVE_MOTOR_CONFIG,
+            31,
+            ANGLE_MOTOR_CONFIG,
+            32,
+            Rotation2d.fromRotations(0.357422).getDegrees(),
+            ANGLE_ENCODER_CONFIG);
+
+    public static final ModuleConfig BACK_LEFT =
+        new ModuleConfig(
+            "backleft",
+            new Coordinates(TRACK_WIDTH_METRES / 2, -WHEEL_BASE_METRES / 2),
+            SDS_MK4I_WHEEL_RADIUS_M,
+            40,
+            DRIVE_MOTOR_CONFIG,
+            41,
+            ANGLE_MOTOR_CONFIG,
+            42,
+            Rotation2d.fromRotations(0.502441).getDegrees(),
             ANGLE_ENCODER_CONFIG);
 
     public static final CoreSwerveConfig CORE_SWERVE_CONFIG =

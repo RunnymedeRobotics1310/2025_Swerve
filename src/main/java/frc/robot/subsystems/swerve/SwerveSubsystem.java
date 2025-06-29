@@ -5,7 +5,7 @@ import static frc.robot.Constants.Swerve.ULTRASONIC_SENSOR_PORT;
 import static frc.robot.Constants.VisionConstants.VISION_PRIMARY_LIMELIGHT_NAME;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
-import ca.team1310.swerve.core.SwerveMath;
+import ca.team1310.swerve.math.SwerveMath;
 import ca.team1310.swerve.utils.SwerveUtils;
 import ca.team1310.swerve.vision.LimelightAwareSwerveDrive;
 import edu.wpi.first.math.controller.PIDController;
