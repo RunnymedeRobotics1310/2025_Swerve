@@ -1,8 +1,6 @@
 package frc.robot.subsystems.swerve;
 
-import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.Swerve.ULTRASONIC_SENSOR_PORT;
-import static frc.robot.Constants.VisionConstants.VISION_PRIMARY_LIMELIGHT_NAME;
 
 import ca.team1310.swerve.RunnymedeSwerveDrive;
 import ca.team1310.swerve.math.SwerveMath;
@@ -33,10 +31,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem(SwerveDriveSubsystemConfig config) {
     this.drive =
         new LimelightAwareSwerveDrive(
-            config.coreConfig(),
-            VISION_PRIMARY_LIMELIGHT_NAME,
-            FIELD_EXTENT_METRES_X,
-            FIELD_EXTENT_METRES_Y);
+            config.coreConfig(), config.gyroConfig(), config.limelightConfig());
     this.config = config;
     this.xLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
     this.yLimiter = new SlewRateLimiter(this.config.translationConfig().maxAccelMPS2());
