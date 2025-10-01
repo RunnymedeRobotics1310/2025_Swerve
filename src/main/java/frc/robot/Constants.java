@@ -202,7 +202,7 @@ public final class Constants {
             /* nominal voltage (V) */ 12,
             /* ramp rate 0 to full power (s)*/ 0.25, // TODO: FIXME: TRY LOWERING THIS A LOT
             /* drive motor gear ratio */ 6.75 /* SDS MK4i L2 --> 6.75:1 */,
-            /* drive motor PID p */ 0.002,
+            /* drive motor PID p */ 0.0002,
             /* drive motor PID i */ 0,
             /* drive motor PID d */ 0,
             /* drive motor PID ff */ 0, // TODO: FIXME: KEEP THIS ZERO BUT SET IN CONTROLLER BASED
