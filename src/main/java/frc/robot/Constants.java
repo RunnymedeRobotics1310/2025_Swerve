@@ -176,7 +176,7 @@ public final class Constants {
             /* max rot vel (rad/s) */ Rotation2d.fromRotations(1.5).getRadians(),
             /* defaultRotVelocityRadPS (rad/s) */ Rotation2d.fromRotations(0.75).getRadians(),
             /* max rotation accel (rad/s/s) */ Rotation2d.fromRotations(2).getRadians(),
-            /* heading PID p */ 0.025, // Rads/Deg
+            /* heading PID p */ 0.004, // Rads/Deg
             /* heading PID i */ 0,
             /* heading PID d */ 0);
 
@@ -202,7 +202,7 @@ public final class Constants {
             /* nominal voltage (V) */ 12,
             /* ramp rate 0 to full power (s)*/ 0.25, // TODO: FIXME: TRY LOWERING THIS A LOT
             /* drive motor gear ratio */ 6.75 /* SDS MK4i L2 --> 6.75:1 */,
-            /* drive motor PID p */ 0.11,
+            /* drive motor PID p */ 0.002,
             /* drive motor PID i */ 0,
             /* drive motor PID d */ 0,
             /* drive motor PID ff */ 0, // TODO: FIXME: KEEP THIS ZERO BUT SET IN CONTROLLER BASED
