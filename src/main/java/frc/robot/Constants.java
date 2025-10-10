@@ -207,6 +207,7 @@ public final class Constants {
             /* drive motor PID d */ 0,
             /* drive motor PID ff */ 1 / TRANSLATION_CONFIG.maxModuleSpeedMPS(),
                 // TODO: FIXME: KEEP THIS ZERO BUT SET IN CONTROLLER BASED
+                // NOTE: https://www.revrobotics.com/development-spark-max-users-manual/#section-3-4
             // ON VELOCITY
             /* drive motor PID izone */ 0);
 
